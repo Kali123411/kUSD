@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T21:18:09Z",
+  "generatedAt": "2026-11-14T22:03:06Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,18 +7,18 @@
   "covenants": {
     "oracle": {
       "covid": "f5bffe9eddc94e78342e0aa7676d86d2e3980d1b78362b8aad3c249d79783db2",
-      "txid": "8b6f8db99f895a175ddd6f3048fe2b22b6eac599ef379e790cfaa4b00bde494a",
+      "txid": "f5b7067a2f4bb3db63f5d09d308b6993448a41c2261a0c5eed43d564b3d77b9d",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 4160,
         "mint": 4160,
         "liq": 4160,
-        "epoch": 5,
-        "last": 623548314,
+        "epoch": 6,
+        "last": 623575336,
         "status": 0
       },
-      "address": "kaspatest:pzhppf3nh5nvckqnh5zlh2ceek97uuy8d6v5t0eua88e8f3ts9r2zpup0wx47"
+      "address": "kaspatest:pp4kxwxs9xtmedpdu3v2daelzl33zfzxg87wnrgy8384w2wtpgehgk60556fd"
     },
     "budget": {
       "covid": "8cea88e03e46b2eab914721fd36eec6a8da971ef4bb489ac6b423d1351701d5d",
@@ -87,8 +87,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      2,
-      3
+      1,
+      2
     ],
     "rotated": [
       {
@@ -237,6 +237,13 @@
       "txid": "eadd528d6aa95e29aad54ad7c15e00aee0e4dcd43d37efcadb75a22829cc37f0",
       "time": 1794648521,
       "note": "The liquidated vault closed and its remaining 2.97 KAS of collateral was released."
+    },
+    {
+      "family": "stage1",
+      "step": "HEARTBEAT",
+      "txid": "f5b7067a2f4bb3db63f5d09d308b6993448a41c2261a0c5eed43d564b3d77b9d",
+      "time": 1794693769,
+      "note": "1 routine refreshes since 2026-11-14 22:02 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 4160 / 4150 / 4170, median $0.4160."
     }
   ],
   "metering": [
