@@ -1,0 +1,263 @@
+{
+  "generatedAt": "2026-11-14T21:18:09Z",
+  "network": "testnet-10",
+  "stage": "Stage 1",
+  "repo": "https://github.com/Kali123411/kUSD",
+  "caveat": "kUSD is TN10 research software: not audited, not a product, not for real value.",
+  "covenants": {
+    "oracle": {
+      "covid": "f5bffe9eddc94e78342e0aa7676d86d2e3980d1b78362b8aad3c249d79783db2",
+      "txid": "8b6f8db99f895a175ddd6f3048fe2b22b6eac599ef379e790cfaa4b00bde494a",
+      "index": 0,
+      "amount": 100000000,
+      "state": {
+        "price": 4160,
+        "mint": 4160,
+        "liq": 4160,
+        "epoch": 5,
+        "last": 623548314,
+        "status": 0
+      },
+      "address": "kaspatest:pzhppf3nh5nvckqnh5zlh2ceek97uuy8d6v5t0eua88e8f3ts9r2zpup0wx47"
+    },
+    "budget": {
+      "covid": "8cea88e03e46b2eab914721fd36eec6a8da971ef4bb489ac6b423d1351701d5d",
+      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "index": 4,
+      "amount": 100000000,
+      "state": {
+        "limit": 4000000,
+        "available": 3999800,
+        "last": 623376850
+      },
+      "address": "kaspatest:ppdyjxc6nhtqgefecfqeran3z2wjtz2pyk3ap0tpu89ghx5j05fkxylr4j4hc"
+    },
+    "psm": {
+      "covid": "3a07300fb8c68df8855db90f4c085fcfdfc7c5bd6c15194714c47e9c41c0ba60",
+      "txid": "2e97ed9b3c2ccd310942adc76ddb0df2c370cd596c89e818ca05ca330ed97a83",
+      "index": 0,
+      "amount": 100000000,
+      "state": {
+        "ceiling": 100000,
+        "minted": 0
+      },
+      "address": "kaspatest:prxua3denut6a0p5xrleuv3rp3gaheumfzqmzt2xeay5r95p2axa70e4chrk8"
+    },
+    "vault": {
+      "covid": "2d7aba9f84090e1112a7004e09765e64624c84db4646141468f4824cdcc52c04",
+      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "index": 0,
+      "amount": 1290000000,
+      "state": {
+        "collateral": 1000000000,
+        "debt": 200
+      },
+      "address": "kaspatest:pqm248eqwgwp2swwx0hjj00z05ktt4w23eyqra0g06jfwu5uqsrzywvyveun9"
+    },
+    "authority": {
+      "covid": "adda24f8fb92a803c8767d0c6281f51901d1d1a2163f57ef853a0e85cbd55e7e",
+      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "index": 1,
+      "amount": 100000000,
+      "state": {
+        "amount": 99999800
+      },
+      "address": "kaspatest:prjzyyr2ppggypqgltcm2576qr32rprej2nrxz4wy56yg32mt6wmvlm3drpx5"
+    },
+    "minted": {
+      "covid": "adda24f8fb92a803c8767d0c6281f51901d1d1a2163f57ef853a0e85cbd55e7e",
+      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "index": 2,
+      "amount": 100000000,
+      "state": {
+        "amount": 200
+      },
+      "address": "kaspatest:prmawndzr78hd9afs8ej70acstz5y8z22puyd3lxdeazyl5cyxyng9a9cmlp7"
+    },
+    "surplus": {
+      "covid": "07fd6a2d4b75304d0cb3867c484e564afafe8a8434f8afbe8742ba599155551a",
+      "txid": "68d9cff2c7f7b9e5f98d3a98d82102437582b4eb3f83a3e790b7472d4b1a476a",
+      "index": 0,
+      "amount": 100000000,
+      "state": {},
+      "address": "kaspatest:pp8h4v37qr6wca57e2cq6muxkkcrg6ac28wp8vvudkkhk59d7l7lw2rnw8fy3"
+    }
+  },
+  "operators": {
+    "slots": 5,
+    "lastRefreshSigners": [
+      0,
+      2,
+      3
+    ],
+    "rotated": [
+      {
+        "slot": 4,
+        "txid": "9629c0e169970f42c354b835c1ddc9d35158c3f71c528b85935a0c314402fbcc"
+      }
+    ]
+  },
+  "timeline": [
+    {
+      "family": "stage1",
+      "step": "ORACLE-GENESIS",
+      "txid": "7166837eec315d7ad950f3853b5a6be8cec45bd624d3d29bd0e48ca743efb160",
+      "time": 1794673722,
+      "note": "Oracle created with five operator slots (on TN10 all five keys are held by the deployer), starting at 40 cents per KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "PSM-GENESIS",
+      "txid": "37fe6ff96ca08b1b31d474aa905e1cf80542081d7b1164c203dcff2aac645679",
+      "time": 1794673727,
+      "note": "Peg stability module created (KAS in, kUSD out), not yet wired to the token."
+    },
+    {
+      "family": "stage1",
+      "step": "SURPLUS-GENESIS",
+      "txid": "68d9cff2c7f7b9e5f98d3a98d82102437582b4eb3f83a3e790b7472d4b1a476a",
+      "time": 1794673732,
+      "note": "Surplus pot created; fees and liquidation penalties land here."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-GENESIS",
+      "txid": "f2593c1dfe4b755706fd9951ac84fdc547af53c755fb0bdc92cb3b332612e421",
+      "time": 1794673737,
+      "note": "Issuance budget created: at most $50,000 of new kUSD per day."
+    },
+    {
+      "family": "stage1",
+      "step": "AUTHORITY-GENESIS",
+      "txid": "5a18b6496721cd6d0a3db439034762796f8d7443642c19778ffcb91699a89a04",
+      "time": 1794673742,
+      "note": "kUSD token authority created; it mints only for covenants it knows by template."
+    },
+    {
+      "family": "stage1",
+      "step": "WIRE",
+      "txid": "2e97ed9b3c2ccd310942adc76ddb0df2c370cd596c89e818ca05ca330ed97a83",
+      "time": 1794673748,
+      "note": "PSM wired to the token authority."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-WIRE",
+      "txid": "e2ff264c9bddf42de047a1dfb9b6bbd850fd8943e8559b61fc29f6535854df5d",
+      "time": 1794673753,
+      "note": "Issuance budget wired in; every mint now draws from it."
+    },
+    {
+      "family": "stage1",
+      "step": "VAULT-GENESIS",
+      "txid": "0ed5db27c95956f9b87e10866a297b72be79a5c118a82e22ee1a684d08650646",
+      "time": 1794673758,
+      "note": "First collateral vault opened: 10 KAS locked."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "a20b5c40e5ead326a28b0d32b9cbdd6078c1d73f2653c29ddae123d424b369e3",
+      "time": 1794673808,
+      "note": "Price refreshed from three separately signed prints: operators 0, 2 and 4 printed 4100 / 4120 / 4090, median $0.4100. The relayer can't change the price, and no operator signed the transaction."
+    },
+    {
+      "family": "stage1",
+      "step": "REFUSED_PRINTS",
+      "txid": null,
+      "time": 1794673808,
+      "note": "Out-of-band prints 4100 / 4110 / 4600: spread over 3%, refused by the covenant (never broadcast)."
+    },
+    {
+      "family": "stage1",
+      "step": "SET_MEMBER",
+      "txid": "9629c0e169970f42c354b835c1ddc9d35158c3f71c528b85935a0c314402fbcc",
+      "time": 1794673829,
+      "note": "Operator slot 4 rotated to a fresh key, signed by operators 0, 1 and 2 (never by the slot being replaced)."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "2fdae10b0e81cdd35fcb319a9082ee3a1e49180419aa5d0554c704968e0bbf4d",
+      "time": 1794673836,
+      "note": "Refresh using the new slot-4 key: operators 1, 3 and 4 printed 4150 / 4140 / 4160, median $0.4150. The mint price moved only 4100 \u2192 4108 because of the rate limit."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-SET-LIMIT",
+      "txid": "ad01eaf94c0031bf701632e3ec3f81306e865dc00d1bae43927afb97e2bb8457",
+      "time": 1794673882,
+      "note": "Governance (2 of 3) lowered the daily issuance limit from $50,000 to $40,000."
+    },
+    {
+      "family": "stage1",
+      "step": "MINT",
+      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "time": 1794673886,
+      "note": "Minted $2.00 of kUSD against the vault, priced at the rate-limited mint price ($0.4108), not the raw $0.4150."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "8b6f8db99f895a175ddd6f3048fe2b22b6eac599ef379e790cfaa4b00bde494a",
+      "time": 1794691042,
+      "note": "Routine refresh after the feed went stale: operators 0, 2 and 3 printed 4160 / 4150 / 4170, median $0.4160. The mint price caught up 4108 \u2192 4160, within its 10%-per-hour limit."
+    },
+    {
+      "family": "phase5",
+      "step": "FREEZE",
+      "txid": "82f8ffef132d51984eed6d6b86eea272d3e4226049499ac6064c174e2cdf4e19",
+      "time": 1794633299,
+      "note": "No refresh for over an hour, so anyone froze the oracle; consumers stopped minting."
+    },
+    {
+      "family": "phase5",
+      "step": "SWAP_OUT_FEE",
+      "txid": "0975d7a659fdfd9dfe5e41ee92915e555c7f7f5f101782548d8dfc85d12e8c85",
+      "time": 1794633444,
+      "note": "kUSD redeemed for KAS through the PSM, fee paid to the surplus pot."
+    },
+    {
+      "family": "phase5",
+      "step": "LIQUIDATE",
+      "txid": "0486065a2488c08c4e590dd0080d508f0c01d367fd4fec14f29e35f5a6a54386",
+      "time": 1794648491,
+      "note": "After a simulated crash (raw price 8000 \u2192 2000) the liquidation price fell at most 25% per hour; three hours later the vault was liquidated at 2532 in one atomic transaction, with the penalty split between the keeper and the surplus pot."
+    },
+    {
+      "family": "phase5",
+      "step": "SURPLUS_SPEND",
+      "txid": "ca25e8dd381c7af54a22e6afe6f08ae04152d7b34fdd74df9158846d6d7e8ba1",
+      "time": 1794648506,
+      "note": "Governance spent from the surplus pot (2 of 3 signatures)."
+    },
+    {
+      "family": "phase5",
+      "step": "CLOSE",
+      "txid": "eadd528d6aa95e29aad54ad7c15e00aee0e4dcd43d37efcadb75a22829cc37f0",
+      "time": 1794648521,
+      "note": "The liquidated vault closed and its remaining 2.97 KAS of collateral was released."
+    }
+  ],
+  "metering": [
+    {
+      "path": "liquidate (atomic, split)",
+      "computeMass": 46092,
+      "pctCap": 9.2
+    },
+    {
+      "path": "swap_out_fee",
+      "computeMass": 50466,
+      "pctCap": 10.1
+    },
+    {
+      "path": "oracle refresh",
+      "computeMass": 6665,
+      "pctCap": 1.3
+    }
+  ],
+  "tests": {
+    "count": 182,
+    "command": "cd contracts/v2/harness && cargo test --release --locked"
+  }
+}
