@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T22:04:45Z",
+  "generatedAt": "2026-11-14T22:10:04Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,30 +7,30 @@
   "covenants": {
     "oracle": {
       "covid": "f5bffe9eddc94e78342e0aa7676d86d2e3980d1b78362b8aad3c249d79783db2",
-      "txid": "06518d546363b73ec06b878393a7312963011487c9955328ef6ec2bda4c627a0",
+      "txid": "d8f4c4f7b3d783647f352c908e3c8e2ceb5d86a93441688186155e15ac620efd",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 4160,
-        "mint": 4160,
-        "liq": 4160,
-        "epoch": 7,
-        "last": 623576244,
+        "price": 258,
+        "mint": 258,
+        "liq": 4081,
+        "epoch": 9,
+        "last": 623579049,
         "status": 0
       },
-      "address": "kaspatest:ppdus3jvdjnsferkvrjjkq4dxlnlgg6cq97cqmd4552jnpnkrajp5kv6d5hjh"
+      "address": "kaspatest:pz2x2kd2p8s3k2sgpy2mkql3ly4lzpq7ukucrevg6r8slp8r77a420y0kjm7f"
     },
     "budget": {
       "covid": "8cea88e03e46b2eab914721fd36eec6a8da971ef4bb489ac6b423d1351701d5d",
-      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "txid": "4294aa4d4040709ffb3b77997525ab634a6c83e514bd5ac395baa0d09984fcc0",
       "index": 4,
       "amount": 100000000,
       "state": {
         "limit": 4000000,
         "available": 3999800,
-        "last": 623376850
+        "last": 623578405
       },
-      "address": "kaspatest:ppdyjxc6nhtqgefecfqeran3z2wjtz2pyk3ap0tpu89ghx5j05fkxylr4j4hc"
+      "address": "kaspatest:pqam2ftlc93jq66c5jfn83nsgk7tuw50d2c9vgnurdv4ee97c0dkqc5qqtjgd"
     },
     "psm": {
       "covid": "3a07300fb8c68df8855db90f4c085fcfdfc7c5bd6c15194714c47e9c41c0ba60",
@@ -45,20 +45,20 @@
     },
     "vault": {
       "covid": "2d7aba9f84090e1112a7004e09765e64624c84db4646141468f4824cdcc52c04",
-      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "txid": "4294aa4d4040709ffb3b77997525ab634a6c83e514bd5ac395baa0d09984fcc0",
       "index": 0,
-      "amount": 1290000000,
+      "amount": 30390000000,
       "state": {
-        "collateral": 1000000000,
+        "collateral": 30100000000,
         "debt": 200
       },
-      "address": "kaspatest:pqm248eqwgwp2swwx0hjj00z05ktt4w23eyqra0g06jfwu5uqsrzywvyveun9"
+      "address": "kaspatest:prk08kheauxj46t5fzggtdra8rsw53as7eugyy6cnzdrs000mh9a6z5zh9uwk"
     },
     "authority": {
       "covid": "adda24f8fb92a803c8767d0c6281f51901d1d1a2163f57ef853a0e85cbd55e7e",
-      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "txid": "4294aa4d4040709ffb3b77997525ab634a6c83e514bd5ac395baa0d09984fcc0",
       "index": 1,
-      "amount": 100000000,
+      "amount": 190000000,
       "state": {
         "amount": 99999800
       },
@@ -66,7 +66,7 @@
     },
     "minted": {
       "covid": "adda24f8fb92a803c8767d0c6281f51901d1d1a2163f57ef853a0e85cbd55e7e",
-      "txid": "54cfc73b7f2836ca43f9a927afaaad56b594c2175d26f371a5aac2c905a81f9b",
+      "txid": "4294aa4d4040709ffb3b77997525ab634a6c83e514bd5ac395baa0d09984fcc0",
       "index": 2,
       "amount": 100000000,
       "state": {
@@ -86,9 +86,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      1,
-      3,
-      4
+      0,
+      2,
+      3
     ],
     "rotated": [
       {
@@ -204,6 +204,41 @@
       "note": "Routine refresh after the feed went stale: operators 0, 2 and 3 printed 4160 / 4150 / 4170, median $0.4160. The mint price caught up 4108 \u2192 4160, within its 10%-per-hour limit."
     },
     {
+      "family": "stage1",
+      "step": "REPAY",
+      "txid": "4eb928698f58eae035f05f19ca7a7407886e8471a94948f7ef498145abf25ee1",
+      "time": 1794694018,
+      "note": "Repaid the $2.00 in full before switching to real prices (the burn credits the issuance budget back); the vault stayed open with 10 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "b375d90a2b5d26b49995523c97c59d85ece8514ec39465e7b8f6f6502d5e5ee5",
+      "time": 1794694031,
+      "note": "Switched from test prints to the real KAS price: operators 2, 3 and 4 each printed CoinGecko's KAS/USD, 258 ($0.0258). The mint price followed at once; the liquidation price can only fall 25% per hour, so it walks down over about half a day."
+    },
+    {
+      "family": "stage1",
+      "step": "ADJUST",
+      "txid": "bce5a575b5b65dcae773d985f2b035d1a3b529f0f340679b965eca91b1c0d38b",
+      "time": 1794694038,
+      "note": "Deposited 290 KAS more, so the vault stays healthy at the real KAS price."
+    },
+    {
+      "family": "stage1",
+      "step": "ADJUST",
+      "txid": "25dd76f4e70ab408053dc88344d5e6469f1157c5fab44037c0172fc36857e961",
+      "time": 1794694108,
+      "note": "Deposited 1 KAS more and topped up the box's fee headroom (it pays a mint's dust and fee)."
+    },
+    {
+      "family": "stage1",
+      "step": "MINT",
+      "txid": "4294aa4d4040709ffb3b77997525ab634a6c83e514bd5ac395baa0d09984fcc0",
+      "time": 1794694123,
+      "note": "Minted $2.00 of kUSD again at the real price ($0.0258): 301 KAS of collateral, worth $7.77, is 388% of the debt (minimum 175%)."
+    },
+    {
       "family": "phase5",
       "step": "FREEZE",
       "txid": "82f8ffef132d51984eed6d6b86eea272d3e4226049499ac6064c174e2cdf4e19",
@@ -241,9 +276,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "06518d546363b73ec06b878393a7312963011487c9955328ef6ec2bda4c627a0",
-      "time": 1794693874,
-      "note": "2 routine refreshes since 2026-11-14 22:02 UTC keep the feed from going stale. Latest: operators 1, 3 and 4 printed 4160 / 4150 / 4170, median $0.4160."
+      "txid": "d8f4c4f7b3d783647f352c908e3c8e2ceb5d86a93441688186155e15ac620efd",
+      "time": 1794694193,
+      "note": "3 routine refreshes since 2026-11-14 22:02 UTC keep the feed from going stale. Latest: operators 0, 2 and 3 printed 258 / 258 / 258 (CoinGecko KAS/USD), median $0.0258."
     }
   ],
   "metering": [
