@@ -1,0 +1,224 @@
+// kUSD v2 global mint budget — a token-bucket singleton that caps issuance
+// velocity across EVERY emitter (vault mint, PSM swap_in / swap_in_fee).
+//
+//   available' = min(limit, available + limit * elapsed / 1 day) - d
+//
+// The bucket refills fully in 24h; bursts can never exceed one day's limit.
+// Clock: now = OpTxInputDaaScore(clock_idx), a consensus LOWER bound on time —
+// understating it only shrinks the refill.
+//
+// NET metering (review I-2): issuance draws from the bucket (`meter`), burns
+// refund it (`credit`), so a swap_in/swap_out or mint/repay round trip nets to
+// zero and the budget can't be griefed by cycling capital.
+//
+// Grief resistance (a drained bucket is a minting DoS — review I-1):
+//  * `meter` and `credit` OBSERVE the kUSD group and authenticate the supply
+//    AUTHORITY (owner_scheme 0x10, by template + covid), and pin its
+//    continuation's amount to `in - d` (meter) / `in + r` (credit) — so d / r
+//    are bound to the real supply change. A plain holder transfer, a burn, or a
+//    governance transfer/rotate can never run `meter`;
+//  * the issuing / burning vault-psm entries observe this box BY COVID and pin
+//    the same transition with their own amounts;
+//  * every entry that moves no supply (adjust, close, set_params) pins this box
+//    ABSENT.
+// The issuing entries hold budget_id in state, validated by the emission gate
+// config (review C2 pattern) — an attacker-authored budget_id can't gate.
+//
+// Genesis convention (like the PSM): geneses UNWIRED (kusd_id = all-zero)
+// BEFORE the authority (whose config pins this box's covid); governance wires
+// it once. While unwired, `meter` refuses.
+
+import "./kusd.ag";
+
+const int DAY_DAA = 864000;                  // 24h at 10 bps
+const int MAX_DAILY_LIMIT = 40000000000;     // 4e10 cents — same i64-safety class as vault MAX_DEBT
+
+// Refilled balance at `now` (callers check now >= last_refill).
+fn budget_refill(int limit, int available, int last_refill, int now) -> int {
+    int elapsed = now - last_refill;
+    if (elapsed > DAY_DAA) { elapsed = DAY_DAA; }
+    int refilled = available + limit * elapsed / DAY_DAA;
+    if (refilled > limit) { refilled = limit; }
+    return refilled;
+}
+
+state BudgetState {
+    int daily_limit;     // USD cents of issuance per 24h (governance 2-of-3)
+    int available;       // bucket balance at last_refill
+    int last_refill;     // DAA score proven at the last meter
+    cov_id kusd_id;      // the kUSD covenant group (all-zero while unwired)
+    pubkey g0;           // governance committee (the PSM's 2-of-3)
+    pubkey g1;
+    pubkey g2;
+}
+
+actor Budget owns BudgetState {
+    // Deduct `d` cents of issuance. tx shape (vault mint / psm swap_in[_fee]):
+    // kUSD group 1 in (the authority) -> 2 out (authority', the emitted box).
+    entry meter(int d, int clock_idx, byte[32] recipient)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+            emitted: KusdApp::Kusd,
+        }
+    }
+    emits next: Budget {
+        require(d > 0);
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);   // the supply authority, never a holder box
+        require(a.amount >= d);
+        KusdState auth_after = {
+            amount: a.amount - d,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        KusdState emitted_state = {
+            amount: d,
+            owner: recipient,
+            owner_scheme: 0x00,
+            borrow_scheme: 0,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+            emitted <- KusdApp::Kusd(emitted_state),
+        };
+
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= last_refill);
+        int avail = budget_refill(daily_limit, available, last_refill, now);
+        require(d <= avail);
+
+        BudgetState next_state = {
+            daily_limit: daily_limit,
+            available: avail - d,
+            last_refill: now,
+            kusd_id: kusd_id,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+        };
+        require(next.value >= self.value);
+        become next <- Budget(next_state);
+    }
+
+    // Refund `r` cents of burned supply. tx shape (vault repay / liquidate,
+    // psm swap_out[_fee]): kUSD group 2 in (authority, holder) -> 1 out.
+    entry credit(int r, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+            holder: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    emits next: Budget {
+        require(r > 0);
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState auth_after = {
+            amount: a.amount + r,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+        };
+
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= last_refill);
+        int refunded = budget_refill(daily_limit, available, last_refill, now) + r;
+        if (refunded > daily_limit) { refunded = daily_limit; }
+
+        BudgetState next_state = {
+            daily_limit: daily_limit,
+            available: refunded,
+            last_refill: now,
+            kusd_id: kusd_id,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+        };
+        require(next.value >= self.value);
+        become next <- Budget(next_state);
+    }
+
+    // Governance moves the daily limit (2-of-3, index-selected). The refill up
+    // to now is settled at the OLD limit first (review M-3: otherwise a raise
+    // applied retroactively over the whole elapsed time), then clamped to the
+    // new limit so a cut takes effect immediately.
+    entry set_limit(int new_limit, int idx_a, int idx_b, sig sig_a, sig sig_b, int clock_idx) emits next: Budget {
+        require(new_limit >= 0);
+        require(new_limit <= MAX_DAILY_LIMIT);
+
+        require(idx_a >= 0);
+        require(idx_a < idx_b);
+        require(idx_b <= 2);
+        pubkey key_a = g0;
+        if (idx_a == 1) { key_a = g1; }
+        pubkey key_b = g1;
+        if (idx_b == 2) { key_b = g2; }
+        require(checkSig(sig_a, key_a));
+        require(checkSig(sig_b, key_b));
+
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= last_refill);
+        int next_available = budget_refill(daily_limit, available, last_refill, now);
+        if (next_available > new_limit) { next_available = new_limit; }
+        BudgetState next_state = {
+            daily_limit: new_limit,
+            available: next_available,
+            last_refill: now,
+            kusd_id: kusd_id,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+        };
+        require(next.value >= self.value);
+        become next <- Budget(next_state);
+    }
+
+    // One-time governance wiring after the kusd authority geneses.
+    entry wire(cov_id new_kusd_id, int idx_a, int idx_b, sig sig_a, sig sig_b) emits next: Budget {
+        require(byte[](kusd_id) == byte[](0x0000000000000000000000000000000000000000000000000000000000000000));
+        require(idx_a >= 0);
+        require(idx_a < idx_b);
+        require(idx_b <= 2);
+        pubkey key_a = g0;
+        if (idx_a == 1) { key_a = g1; }
+        pubkey key_b = g1;
+        if (idx_b == 2) { key_b = g2; }
+        require(checkSig(sig_a, key_a));
+        require(checkSig(sig_b, key_b));
+
+        BudgetState next_state = {
+            daily_limit: daily_limit,
+            available: available,
+            last_refill: last_refill,
+            kusd_id: new_kusd_id,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+        };
+        require(next.value >= self.value);
+        become next <- Budget(next_state);
+    }
+}
+
+app BudgetApp {
+    actor Budget;
+}

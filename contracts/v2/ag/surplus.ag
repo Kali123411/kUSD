@@ -1,0 +1,71 @@
+// kUSD v2 governance surplus covenant — a single box holding protocol revenue
+// in KAS. The box VALUE is the balance; state carries only the 3 governance
+// keys (the PSM governance set) and the kusd family id (informational — the
+// SPENDERS pin this box by covid: psm fee entries and vault liquidate check
+// OpInputCovenantId(surplus_idx) against the surplus_id wired into their own
+// state, the Phase 2 C-1 pattern).
+//
+// Fees arrive through `receive` (permissionless, value must not decrease):
+// PSM spread routing and the liquidation-penalty split co-spend this box with
+// `receive` as its entry, and anyone may top it up. Governance withdraws with
+// `spend` (2-of-3 by index, destination pinned at tx.outputs[1]).
+
+const int SURPLUS_TOMBSTONE = 100000000;   // KIP-9 storage-mass floor convention
+
+state SurplusState {
+    pubkey g0;
+    pubkey g1;
+    pubkey g2;
+    byte[32] kusd_id;
+}
+
+actor Surplus owns SurplusState {
+    // Permissionless top-up: the continuation preserves state and never loses
+    // value. Co-spent by the PSM fee entries and vault liquidate, which pin
+    // the exact value increase on their side.
+    entry receive() emits next: Surplus {
+        SurplusState next_state = {
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+        };
+        require(next.value >= self.value);
+        become next <- Surplus(next_state);
+    }
+
+    // Governance withdrawal: 2-of-3 by index (0 <= idx_a < idx_b <= 2), the
+    // payout pinned at tx.outputs[1] (the surplus continuation is outputs[0]),
+    // the box floor preserved.
+    entry spend(int amount, byte[32] dest, int idx_a, int idx_b, sig sig_a, sig sig_b) emits next: Surplus {
+        require(amount > 0);
+
+        require(idx_a >= 0);
+        require(idx_a < idx_b);
+        require(idx_b <= 2);
+        pubkey key_a = g0;
+        if (idx_a == 1) { key_a = g1; }
+        // idx_a == 2 is unreachable: idx_a < idx_b <= 2 forces idx_a <= 1
+        pubkey key_b = g1;
+        if (idx_b == 2) { key_b = g2; }
+        require(checkSig(sig_a, key_a));
+        require(checkSig(sig_b, key_b));
+
+        require(next.value == self.value - amount);
+        require(next.value >= SURPLUS_TOMBSTONE);
+        require(tx.outputs[1].value == amount);
+        require(tx.outputs[1].scriptPubKey == byte[](new ScriptPubKeyP2PK(pubkey(dest))));
+
+        SurplusState next_state = {
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+        };
+        become next <- Surplus(next_state);
+    }
+}
+
+app SurplusApp {
+    actor Surplus;
+}

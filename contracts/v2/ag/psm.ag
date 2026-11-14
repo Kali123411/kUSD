@@ -1,0 +1,703 @@
+// kUSD v2 PSM — a USD-priced redemption reserve: the peg floor, in-covenant,
+// with no bridged stable. KAS flows in/out of a singleton reserve box at the
+// committee-oracle price; kUSD supply moves 1:1 in USD cents through the
+// authority's `emission` (this contract is the second gate kind the blake3
+// config in extension_commitment names).
+//
+// Peg mechanics: swap_in mints kUSD at $1 of KAS per cent-100 (peg ceiling —
+// capped by a governance ceiling); swap_out redeems kUSD for $1 of KAS (peg
+// floor — PERMISSIONLESS and NEVER ceiling-blocked, SPEC §3: governance can
+// stop the PSM growing, never unwinding). Redemption is bounded by the PSM's
+// own minted total in this slice. It is paid from the reserve's own KAS (deposited
+// at each swap_in's price): if KAS falls far enough, redemptions are first-come
+// until the TOMBSTONE floor, then fail — disclosed in the whitepaper's known limits.
+//
+// INVARIANT (emission gate): every entry here observes and pins the kusd
+// group named by state kusd_id — frozen where the entry moves no supply
+// (set_ceiling) — so the authority's `emission` can never run unconstrained
+// under a PSM input.
+
+import "./kusd.ag";
+import "./oracle.ag";
+import "./surplus.ag";
+import "./budget.ag";
+
+const int TOMBSTONE = 100000000;
+const int MAX_SWAP = 40000000000;        // 4e10 cents, same i64-safety class as the vault
+const int MAX_SPREAD_BPS = 200;          // fee-switch ceiling: 2%
+
+// Genesis convention: the box geneses UNWIRED (kusd_id = all-zero) BEFORE the
+// kusd authority exists (the authority's config pins this box's covid), then
+// governance wires it once. While unwired, no swap or ceiling entry can run
+// (their observes resolve by kusd_id) and no emission can gate off it
+// (pgate.kusd_id == 0 never equals a covid).
+state PsmState {
+    int ceiling_cents;    // governance cap on minted_cents growth
+    int minted_cents;     // kUSD outstanding via this PSM
+    int spread_bps;       // fee switch: swap spread in basis points (0 = off)
+    pubkey g0;            // 2-of-3 governance committee for set_params
+    pubkey g1;
+    pubkey g2;
+    cov_id kusd_id;       // the kUSD covenant group
+    cov_id oracle_id;     // the genuine oracle singleton
+    cov_id surplus_id;    // the governance surplus box (fee destination)
+    cov_id budget_id;     // the global mint budget (meters swap_in issuance)
+}
+
+actor Psm owns PsmState {
+    // Permissionless mint: deposit KAS worth `c` cents at the oracle price,
+    // receive `c` cents of kUSD. Ceiling-capped.
+    // tx: [psm, authority, oracle] -> [psm', auth', emitted, oracle']
+    entry swap_in(int c, byte[32] recipient, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+            emitted: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Psm {
+        // review C1: single-emitter exclusivity — the (singleton) psm lineage
+        // leads at transaction input 0
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(spread_bps == 0);   // fee switch off: the no-surplus fast path
+        require(c > 0);
+        require(c <= MAX_SWAP);
+        require(minted_cents >= 0);
+        require(minted_cents + c <= ceiling_cents);
+
+        OracleState o = state(oracle.inputs.ora);
+        require(o.status == STATUS_LIVE);   // no PSM minting on a frozen or settled feed
+        require(o.mint_price > 0);
+        require(o.mint_price <= MAX_PRICE);
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        require(a.amount >= c);
+
+        int kas_in = sompi_of_ceil(c, o.mint_price);   // low-biased price, rounded up: the user pays the reserve in full
+        require(kas_in > 0);
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int avail = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now);
+        require(c <= avail);
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: avail - c,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        require(next.value >= self.value + kas_in);
+
+        KusdState auth_after = {
+            amount: a.amount - c,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        KusdState emitted_state = {
+            amount: c,
+            owner: recipient,
+            owner_scheme: 0x00,
+            borrow_scheme: 0,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+            emitted <- KusdApp::Kusd(emitted_state),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        PsmState next_state = {
+            ceiling_cents: ceiling_cents,
+            minted_cents: minted_cents + c,
+            spread_bps: spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        become next <- Psm(next_state);
+    }
+
+    // Permissionless redemption (the peg floor): burn `c` cents of kUSD, take
+    // KAS worth `c` cents at the oracle price. NEVER ceiling-gated.
+    // tx: [psm, authority, holder, oracle] -> [psm', auth', payout(P2PK), oracle']
+    entry swap_out(int c, byte[32] redeemer, sig burner_sig, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+            holder: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Psm {
+        // review C1: single-emitter exclusivity — the (singleton) psm lineage
+        // leads at transaction input 0
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(spread_bps == 0);   // fee switch off: the no-surplus fast path
+        require(c > 0);
+        require(c <= MAX_SWAP);
+        require(minted_cents >= c);   // redemption bounded by this PSM's own issuance
+
+        OracleState o = state(oracle.inputs.ora);
+        // the peg floor runs in ANY oracle status (frozen/settled: at the last liq_price)
+        require(o.liq_price > 0);
+        require(o.liq_price <= MAX_PRICE);
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState h = state(kusd.inputs.holder);
+        require(h.owner_scheme == 0x00);
+        require(h.amount == c);
+        require(checkSig(burner_sig, pubkey(h.owner)));
+
+        // net metering (review I-2): the burn refunds issuance headroom
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int refunded = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now) + c;
+        if (refunded > bs.daily_limit) { refunded = bs.daily_limit; }
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: refunded,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        int kas_out = sompi_of(c, o.liq_price);   // high-biased price: fewer KAS per cent
+        require(kas_out > 0);
+        require(next.value >= self.value - kas_out);
+        require(next.value >= TOMBSTONE);
+
+        KusdState auth_after = {
+            amount: a.amount + c,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        // forced payout at fixed position: [0] psm', [1] auth', [2] payout, [3] oracle'
+        require(tx.outputs[2].value == kas_out);
+        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(pubkey(redeemer))));
+
+        PsmState next_state = {
+            ceiling_cents: ceiling_cents,
+            minted_cents: minted_cents - c,
+            spread_bps: spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        become next <- Psm(next_state);
+    }
+
+    // Fee-switch mint: as swap_in, plus the KAS-side spread routed to the
+    // governance surplus box (pinned by COVID via the observe). The user funds
+    // kas_in + fee; the reserve takes exactly kas_in (backing unchanged).
+    // tx: [psm, authority, surplus, oracle, funding] -> [psm', auth', emitted, surplus', oracle', ...]
+    entry swap_in_fee(int c, byte[32] recipient, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+            emitted: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes surplus by self.surplus_id {
+        inputs {
+            s: SurplusApp::Surplus,
+        }
+
+        outputs {
+            s_next: SurplusApp::Surplus,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Psm {
+        // review C1: single-emitter exclusivity — the (singleton) psm lineage
+        // leads at transaction input 0
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(spread_bps > 0);
+        require(spread_bps <= MAX_SPREAD_BPS);
+        require(c > 0);
+        require(c <= MAX_SWAP);
+        require(minted_cents >= 0);
+        require(minted_cents + c <= ceiling_cents);
+
+        OracleState o = state(oracle.inputs.ora);
+        require(o.status == STATUS_LIVE);   // no PSM minting on a frozen or settled feed
+        require(o.mint_price > 0);
+        require(o.mint_price <= MAX_PRICE);
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        require(a.amount >= c);
+
+        int kas_in = sompi_of_ceil(c, o.mint_price);   // low-biased price, rounded up: the user pays the reserve in full
+        require(kas_in > 0);
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int avail = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now);
+        require(c <= avail);
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: avail - c,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        int fee = kas_in * spread_bps / 10000;
+        require(fee > 0);   // dust-sized fee-evading swaps are refused, not waived
+        require(next.value >= self.value + kas_in);
+        // the surplus continuation's position comes from the covenant group
+        // itself (OpCovOutputIdx), so the fee lands in THE pinned instance
+        int s_out_idx = OpCovOutputIdx(surplus_id, 0);
+        require(tx.outputs[s_out_idx].value == surplus.inputs.s.value + fee);
+
+        KusdState auth_after = {
+            amount: a.amount - c,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        KusdState emitted_state = {
+            amount: c,
+            owner: recipient,
+            owner_scheme: 0x00,
+            borrow_scheme: 0,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+            emitted <- KusdApp::Kusd(emitted_state),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        SurplusState s_state = state(surplus.inputs.s);
+        SurplusState s_after = {
+            g0: s_state.g0,
+            g1: s_state.g1,
+            g2: s_state.g2,
+            kusd_id: s_state.kusd_id,
+        };
+        require surplus.outputs become {
+            s_next <- SurplusApp::Surplus(s_after),
+        };
+
+        PsmState next_state = {
+            ceiling_cents: ceiling_cents,
+            minted_cents: minted_cents + c,
+            spread_bps: spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        become next <- Psm(next_state);
+    }
+
+    // Fee-switch redemption: as swap_out, with the spread taken OUT OF the
+    // payout (the reserve still shrinks by the full kas_out, so backing per
+    // outstanding cent is preserved; the redeemer nets kas_out - fee).
+    // tx: [psm, authority, holder, surplus, oracle] -> [psm', auth', payout(P2PK), surplus', oracle']
+    entry swap_out_fee(int c, byte[32] redeemer, sig burner_sig, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+            holder: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes surplus by self.surplus_id {
+        inputs {
+            s: SurplusApp::Surplus,
+        }
+
+        outputs {
+            s_next: SurplusApp::Surplus,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Psm {
+        // review C1: single-emitter exclusivity — the (singleton) psm lineage
+        // leads at transaction input 0
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(spread_bps > 0);
+        require(spread_bps <= MAX_SPREAD_BPS);
+        require(c > 0);
+        require(c <= MAX_SWAP);
+        require(minted_cents >= c);
+
+        OracleState o = state(oracle.inputs.ora);
+        // the peg floor runs in ANY oracle status (frozen/settled: at the last liq_price)
+        require(o.liq_price > 0);
+        require(o.liq_price <= MAX_PRICE);
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState h = state(kusd.inputs.holder);
+        require(h.owner_scheme == 0x00);
+        require(h.amount == c);
+        require(checkSig(burner_sig, pubkey(h.owner)));
+
+        // net metering (review I-2): the burn refunds issuance headroom
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int refunded = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now) + c;
+        if (refunded > bs.daily_limit) { refunded = bs.daily_limit; }
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: refunded,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        int kas_out = sompi_of(c, o.liq_price);   // high-biased price: fewer KAS per cent
+        require(kas_out > 0);
+        int fee = kas_out * spread_bps / 10000;
+        require(fee > 0);
+        require(next.value >= self.value - kas_out);
+        require(next.value >= TOMBSTONE);
+        int s_out_idx = OpCovOutputIdx(surplus_id, 0);
+        require(tx.outputs[s_out_idx].value == surplus.inputs.s.value + fee);
+
+        KusdState auth_after = {
+            amount: a.amount + c,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        SurplusState s_state = state(surplus.inputs.s);
+        SurplusState s_after = {
+            g0: s_state.g0,
+            g1: s_state.g1,
+            g2: s_state.g2,
+            kusd_id: s_state.kusd_id,
+        };
+        require surplus.outputs become {
+            s_next <- SurplusApp::Surplus(s_after),
+        };
+
+        // forced net payout at fixed position: [0] psm', [1] auth', [2] payout
+        require(tx.outputs[2].value == kas_out - fee);
+        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(pubkey(redeemer))));
+
+        PsmState next_state = {
+            ceiling_cents: ceiling_cents,
+            minted_cents: minted_cents - c,
+            spread_bps: spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        become next <- Psm(next_state);
+    }
+
+    // Governance (2-of-3, index-selected like the oracle committee) moves the
+    // ceiling and the fee-switch spread. The kusd family is co-spent FROZEN so
+    // the emission gate can never hide under this entry.
+    // tx: [psm, authority] -> [psm', auth']
+    entry set_params(int new_ceiling, int new_spread_bps, int idx_a, int idx_b, sig sig_a, sig sig_b)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    emits next: Psm {
+        // review C1: single-emitter exclusivity — the (singleton) psm lineage
+        // leads at transaction input 0
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(OpCovInputCount(budget_id) == 0);   // budget meters issuance only (burn-tx grief)
+        require(new_ceiling >= 0);
+        require(new_spread_bps >= 0);
+        require(new_spread_bps <= MAX_SPREAD_BPS);
+
+        require(idx_a >= 0);
+        require(idx_a < idx_b);
+        require(idx_b <= 2);
+        pubkey key_a = g0;
+        if (idx_a == 1) { key_a = g1; }
+        pubkey key_b = g1;
+        if (idx_b == 2) { key_b = g2; }
+        require(checkSig(sig_a, key_a));
+        require(checkSig(sig_b, key_b));
+
+        // frozen family: the authority continues UNCHANGED
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState frozen = {
+            amount: a.amount,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(frozen),
+        };
+
+        PsmState next_state = {
+            ceiling_cents: new_ceiling,
+            minted_cents: minted_cents,
+            spread_bps: new_spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        require(next.value >= self.value);
+        become next <- Psm(next_state);
+    }
+
+    // One-time governance wiring after the kusd authority and the surplus box
+    // genesis (both covids become known then).
+    entry wire(cov_id new_kusd_id, cov_id new_surplus_id, cov_id new_budget_id, int idx_a, int idx_b, sig sig_a, sig sig_b) emits next: Psm {
+        require(byte[](kusd_id) == byte[](0x0000000000000000000000000000000000000000000000000000000000000000));
+        require(byte[](surplus_id) == byte[](0x0000000000000000000000000000000000000000000000000000000000000000));
+        require(byte[](budget_id) == byte[](0x0000000000000000000000000000000000000000000000000000000000000000));
+        require(idx_a >= 0);
+        require(idx_a < idx_b);
+        require(idx_b <= 2);
+        pubkey key_a = g0;
+        if (idx_a == 1) { key_a = g1; }
+        pubkey key_b = g1;
+        if (idx_b == 2) { key_b = g2; }
+        require(checkSig(sig_a, key_a));
+        require(checkSig(sig_b, key_b));
+
+        PsmState next_state = {
+            ceiling_cents: ceiling_cents,
+            minted_cents: minted_cents,
+            spread_bps: spread_bps,
+            g0: g0,
+            g1: g1,
+            g2: g2,
+            kusd_id: new_kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: new_surplus_id,
+            budget_id: new_budget_id,
+        };
+        require(next.value >= self.value);
+        become next <- Psm(next_state);
+    }
+}
+
+app PsmApp {
+    actor Psm;
+}

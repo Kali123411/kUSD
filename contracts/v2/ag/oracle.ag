@@ -1,0 +1,317 @@
+// kUSD v2 committee oracle — singleton price feed.
+//
+// Phase 5 (KSD-style safety rails):
+//  * Price unit: 1e-4 USD per whole KAS (hundredths of a cent; KAS at $0.0366
+//    = 366). Integer cents rounded ±14% at today's price and made any integer
+//    rate limit round to zero.
+//  * Two derived prices, rate-limited against the committee's raw print (each
+//    refresh applies at most one hour of rate, however long the silence):
+//      mint_price follows the raw price DOWN at once, UP at most 10%/hour
+//        (borrowing power can't spike on a manipulated or flash-pumped print);
+//      liq_price  follows the raw price UP at once, DOWN at most 25%/hour
+//        (a manipulated low print can't trigger mass liquidations at once).
+//    Vaults mint/withdraw against mint_price and liquidate against liq_price;
+//    the PSM swaps in at mint_price and out at liq_price.
+//  * Clock: OpTxInputDaaScore(clock_idx), the confirmation DAA score of a
+//    co-spent input — a consensus-proven LOWER bound on the current time. freeze
+//    / settle prove staleness with it; refresh uses it only to reject
+//    future-dated prints (its time is the median signed-at, see Operators).
+//    Understating it only shrinks the caller's allowed move. last_update lives
+//    in state: the box's own DAA score resets on every `peek`, which would let
+//    anyone grief the rate limit.
+//  * Liveness: anyone may `freeze` a feed not refreshed for > 1 hour and
+//    `settle` one not refreshed for > 30 days (permanent). A script can only
+//    prove a lower bound on time, so staleness must be keeper-triggered. While
+//    not LIVE, consumers refuse mint / withdraw / liquidate / swap_in; repay,
+//    close, deposits and PSM swap_out (the peg floor) keep working.
+//
+// Operators (oracle roadmap Stage 1): five operators each sign their OWN price
+// print offline over blake2b(oracle covid ‖ i64le(epoch) ‖ i64le(price) ‖
+// i64le(signed_at)) (checkMsgSig) — binding the covid stops replay into another
+// oracle, the epoch stops replay into a later refresh, and the signed-at DAA
+// score is the feed's TIME (stage-1 review I-1/I-2): rate-limit elapsed and
+// last_update come from the median signed-at, never from the relayer's clock
+// input, which now only proves no print is future-dated. A frozen feed revives
+// only with prints signed after the staleness window, so held-back prints can't
+// resurrect an old price. Anyone relays three prints from distinct
+// operators; the raw price is their MEDIAN, accepted only if the three agree
+// within SPREAD_BPS. One bad operator can't move the price; two colluders can
+// move it only within the spread band (with one honest print in the set); free
+// movement needs three of five — and the rate limits bound even that. Three
+// operators other than the replaced slot can rotate its key (so two
+// compromised operators can always be replaced). Operators live in state; vaults
+// authenticate the feed by COVID.
+
+const int MAX_PRICE = 100000000;      // $10,000/KAS in 1e-4 USD units — vault math headroom bound
+const int MAX_EPOCH_STEP = 1000000;   // a quorum cannot jump the epoch to i64::MAX and brick refresh
+const int RATE_WINDOW = 36000;        // each refresh moves prices by at most ONE hour of rate (review I-3:
+                                      // a linear 25%/h floor reached zero after 4h of silence)
+const int MINT_UP_DIV = 360000;       // mint_price may rise price*elapsed/360000: 10% per 36,000 DAA
+const int LIQ_DOWN_DIV = 144000;      // liq_price may fall price*elapsed/144000: 25% per 36,000 DAA
+const int STALE_DAA = 36000;          // 1 hour: freezable after this much silence
+const int SETTLE_DAA = 25920000;      // 30 days: settleable after this much silence
+const int SPREAD_BPS = 300;           // the three prints must agree within 3% of their median
+const int STATUS_LIVE = 0;
+const int STATUS_FROZEN = 1;
+const int STATUS_SETTLED = 2;
+
+// USD cents represented by `sompi` at `price` (1e-4 USD/KAS). Overflow-safe for
+// sompi <= 4e12 (vault MAX_COLLATERAL) and price <= MAX_PRICE: 4e10 * 1e8.
+fn usd_cents_of(int sompi, int price) -> int {
+    int whole = sompi / 100;
+    int cents = whole * price / 100000000;
+    return cents;
+}
+
+// Sompi worth `cents` at `price`, truncated to 1e-4 KAS. The first product is
+// safe for cents <= 4.4e10; the second overflows (the script fails closed)
+// only when cents / price > 9.2e8 — e.g. a $400M swap at under $0.005/KAS.
+fn sompi_of(int cents, int price) -> int {
+    int units = cents * 1000000 / price;
+    int sompi = units * 10000;
+    return sompi;
+}
+
+// Same, rounded UP to the next 1e-4 KAS: what a user must PAY into a reserve.
+fn sompi_of_ceil(int cents, int price) -> int {
+    int units = (cents * 1000000 + price - 1) / price;
+    int sompi = units * 10000;
+    return sompi;
+}
+
+// Operator slot i's key.
+fn operator_key(int i, pubkey k0, pubkey k1, pubkey k2, pubkey k3, pubkey k4) -> pubkey {
+    pubkey k = k0;
+    if (i == 1) { k = k1; }
+    if (i == 2) { k = k2; }
+    if (i == 3) { k = k3; }
+    if (i == 4) { k = k4; }
+    return k;
+}
+
+state OracleState {
+    int price;         // last raw committee print (1e-4 USD per whole KAS)
+    int mint_price;    // rate-limited, low-biased: minting and withdrawals
+    int liq_price;     // rate-limited, high-biased: liquidations and redemptions
+    int epoch;         // strictly increasing on every refresh
+    int last_update;   // the feed's time: median signed-at DAA of the last refresh's prints
+    int status;        // 0 live, 1 frozen, 2 settled
+    pubkey m0;   // the five price operators
+    pubkey m1;
+    pubkey m2;
+    pubkey m3;
+    pubkey m4;
+}
+
+actor Oracle owns OracleState {
+    entry refresh(int new_epoch, int i0, int p0, int t0, datasig s0, int i1, int p1, int t1, datasig s1, int i2, int p2, int t2, datasig s2, int clock_idx) emits next: Oracle {
+        require(status != STATUS_SETTLED);
+        require(new_epoch > epoch);
+        require(new_epoch <= epoch + MAX_EPOCH_STEP);
+
+        // three DISTINCT operators: 0 <= i0 < i1 < i2 <= 4
+        require(i0 >= 0);
+        require(i0 < i1);
+        require(i1 < i2);
+        require(i2 <= 4);
+        require(p0 > 0);
+        require(p0 <= MAX_PRICE);
+        require(p1 > 0);
+        require(p1 <= MAX_PRICE);
+        require(p2 > 0);
+        require(p2 <= MAX_PRICE);
+
+        // no print is future-dated: each signed-at time is at or before what a
+        // co-spent input's confirmation proves
+        int clock = OpTxInputDaaScore(clock_idx);
+        require(t0 <= clock);
+        require(t1 <= clock);
+        require(t2 <= clock);
+
+        // each print signed by its operator for THIS oracle, THIS epoch, its time
+        byte[] tag = byte[](self.cov_id) + OpNum2Bin(new_epoch, 8);
+        require(checkMsgSig(s0, blake2b(tag + OpNum2Bin(p0, 8) + OpNum2Bin(t0, 8)), operator_key(i0, m0, m1, m2, m3, m4)));
+        require(checkMsgSig(s1, blake2b(tag + OpNum2Bin(p1, 8) + OpNum2Bin(t1, 8)), operator_key(i1, m0, m1, m2, m3, m4)));
+        require(checkMsgSig(s2, blake2b(tag + OpNum2Bin(p2, 8) + OpNum2Bin(t2, 8)), operator_key(i2, m0, m1, m2, m3, m4)));
+
+        // median of three prices, and the spread across them (one unit of slack
+        // keeps honest prints usable when the 3% band is under one unit)
+        int lo = p0;
+        int hi = p0;
+        if (p1 < lo) { lo = p1; }
+        if (p2 < lo) { lo = p2; }
+        if (p1 > hi) { hi = p1; }
+        if (p2 > hi) { hi = p2; }
+        int new_price = p0 + p1 + p2 - lo - hi;
+        require((hi - lo) * 10000 <= new_price * SPREAD_BPS + 10000);
+
+        // the feed's time: the median signed-at
+        int tlo = t0;
+        int thi = t0;
+        if (t1 < tlo) { tlo = t1; }
+        if (t2 < tlo) { tlo = t2; }
+        if (t1 > thi) { thi = t1; }
+        if (t2 > thi) { thi = t2; }
+        int now = t0 + t1 + t2 - tlo - thi;
+        require(now >= last_update);
+        if (status == STATUS_FROZEN) {
+            // revival only by prints signed after the silence that froze it
+            require(now - last_update > STALE_DAA);
+        }
+        int elapsed = now - last_update;
+        if (elapsed > RATE_WINDOW) { elapsed = RATE_WINDOW; }
+
+        int next_mint = new_price;
+        if (new_price > mint_price) {
+            // at least one unit per refresh with elapsed time: a truncated
+            // zero step would pin a tiny mint_price forever (final review I-1)
+            int mint_step = mint_price * elapsed / MINT_UP_DIV;
+            if (mint_step < 1 && elapsed > 0) { mint_step = 1; }
+            int mint_cap = mint_price + mint_step;
+            if (next_mint > mint_cap) { next_mint = mint_cap; }
+        }
+        int next_liq = new_price;
+        if (new_price < liq_price) {
+            int liq_step = liq_price * elapsed / LIQ_DOWN_DIV;
+            if (liq_step < 1 && elapsed > 0) { liq_step = 1; }
+            int liq_floor = liq_price - liq_step;
+            if (next_liq < liq_floor) { next_liq = liq_floor; }
+        }
+
+        OracleState next_state = {
+            price: new_price,
+            mint_price: next_mint,
+            liq_price: next_liq,
+            epoch: new_epoch,
+            last_update: now,
+            status: STATUS_LIVE,
+            m0: m0,
+            m1: m1,
+            m2: m2,
+            m3: m3,
+            m4: m4,
+        };
+        require(next.value == self.value);
+        become next <- Oracle(next_state);
+    }
+
+    // Three operators OTHER than the replaced slot rotate its key (stage-1
+    // review I-3: under 4-of-5, two compromised operators could never be
+    // removed; three colluders already control the price, so 3 adds no power). They sign
+    // blake2b(oracle covid ‖ "member" ‖ i64le(epoch) ‖ i64le(slot) ‖ new_key); the
+    // epoch is bumped so a rotation can't be replayed to undo a later one, and
+    // the new key must not already hold a slot (one operator, one vote).
+    entry set_member(int slot, pubkey new_key, int a, int b, int c, datasig sa, datasig sb, datasig sc) emits next: Oracle {
+        require(status != STATUS_SETTLED);
+        require(slot >= 0);
+        require(slot <= 4);
+        require(a >= 0);
+        require(a < b);
+        require(b < c);
+        require(c <= 4);
+        require(a != slot);
+        require(b != slot);
+        require(c != slot);
+        require(byte[](new_key) != byte[](m0));
+        require(byte[](new_key) != byte[](m1));
+        require(byte[](new_key) != byte[](m2));
+        require(byte[](new_key) != byte[](m3));
+        require(byte[](new_key) != byte[](m4));
+
+        byte[32] digest = blake2b(byte[](self.cov_id) + byte[](0x6d656d626572) + OpNum2Bin(epoch, 8) + OpNum2Bin(slot, 8) + byte[](new_key));
+        require(checkMsgSig(sa, digest, operator_key(a, m0, m1, m2, m3, m4)));
+        require(checkMsgSig(sb, digest, operator_key(b, m0, m1, m2, m3, m4)));
+        require(checkMsgSig(sc, digest, operator_key(c, m0, m1, m2, m3, m4)));
+
+        pubkey n0 = m0;
+        pubkey n1 = m1;
+        pubkey n2 = m2;
+        pubkey n3 = m3;
+        pubkey n4 = m4;
+        if (slot == 0) { n0 = new_key; }
+        if (slot == 1) { n1 = new_key; }
+        if (slot == 2) { n2 = new_key; }
+        if (slot == 3) { n3 = new_key; }
+        if (slot == 4) { n4 = new_key; }
+        OracleState next_state = {
+            price: price,
+            mint_price: mint_price,
+            liq_price: liq_price,
+            epoch: epoch + 1,
+            last_update: last_update,
+            status: status,
+            m0: n0,
+            m1: n1,
+            m2: n2,
+            m3: n3,
+            m4: n4,
+        };
+        require(next.value == self.value);
+        become next <- Oracle(next_state);
+    }
+
+    // Permissionless: a feed silent for more than STALE_DAA can be frozen.
+    entry freeze(int clock_idx) emits next: Oracle {
+        require(status == STATUS_LIVE);
+        require(OpTxInputDaaScore(clock_idx) - last_update > STALE_DAA);
+        OracleState next_state = {
+            price: price,
+            mint_price: mint_price,
+            liq_price: liq_price,
+            epoch: epoch,
+            last_update: last_update,
+            status: STATUS_FROZEN,
+            m0: m0,
+            m1: m1,
+            m2: m2,
+            m3: m3,
+            m4: m4,
+        };
+        require(next.value == self.value);
+        become next <- Oracle(next_state);
+    }
+
+    // Permissionless: a feed silent for more than SETTLE_DAA settles forever.
+    entry settle(int clock_idx) emits next: Oracle {
+        require(status != STATUS_SETTLED);
+        require(OpTxInputDaaScore(clock_idx) - last_update > SETTLE_DAA);
+        OracleState next_state = {
+            price: price,
+            mint_price: mint_price,
+            liq_price: liq_price,
+            epoch: epoch,
+            last_update: last_update,
+            status: STATUS_SETTLED,
+            m0: m0,
+            m1: m1,
+            m2: m2,
+            m3: m3,
+            m4: m4,
+        };
+        require(next.value == self.value);
+        become next <- Oracle(next_state);
+    }
+
+    // Read-only passthrough: identical state, value preserved, no signatures.
+    entry peek() emits next: Oracle {
+        OracleState next_state = {
+            price: price,
+            mint_price: mint_price,
+            liq_price: liq_price,
+            epoch: epoch,
+            last_update: last_update,
+            status: status,
+            m0: m0,
+            m1: m1,
+            m2: m2,
+            m3: m3,
+            m4: m4,
+        };
+        require(next.value == self.value);
+        become next <- Oracle(next_state);
+    }
+}
+
+app OracleApp {
+    actor Oracle;
+}

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "previousOutpoint": {
+        "transactionId": "92e6333439459ddbc90dbf2ef018e33bcd3b6af152d97835f62dfab06f82598e",
+        "index": 1
+      },
+      "signatureScript": "41e2bc6623cae1300817269400cd530da0e4f8e76416993a48288d037a655b6d2a768e0549751f4c8ec5ded76ed14b6f92be82f598c39591fa208ab4919d9255ea01",
+      "sequence": 0,
+      "sigOpCount": 0,
+      "computeBudget": 10,
+      "verboseData": null
+    }
+  ],
+  "outputs": [
+    {
+      "value": 100000000,
+      "scriptPublicKey": "0000aa204f7ab23e00f4ec769ecab00d6f86b5b0346bb851dc13b19c6dad7b50adf7fdf787",
+      "verboseData": null,
+      "covenant": {
+        "authorizingInput": 0,
+        "covenantId": "00b9bcbfc0ffc0617bb50df6d2cc0410e963bb52efabc7e00d064c18613f5385"
+      }
+    },
+    {
+      "value": 995510000000,
+      "scriptPublicKey": "00002080277ad8332a36331608d3085e5aed0ceb00b2449adbefbf4ad01d98803cb53cac",
+      "verboseData": null,
+      "covenant": null
+    }
+  ],
+  "lockTime": 0,
+  "subnetworkId": "0000000000000000000000000000000000000000",
+  "gas": 0,
+  "payload": "",
+  "storageMass": 0,
+  "mass": 0,
+  "verboseData": null
+}

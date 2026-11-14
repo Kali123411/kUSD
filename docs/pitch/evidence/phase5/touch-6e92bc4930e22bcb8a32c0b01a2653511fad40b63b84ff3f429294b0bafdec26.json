@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "inputs": [
+    {
+      "previousOutpoint": {
+        "transactionId": "013630e4302b24b8dd4fd0b4f78f59dab29f6bb24ad0fa3492eaa9e6fd6cb6a8",
+        "index": 1
+      },
+      "signatureScript": "418d77d6d4fe1d720b66cbb59a8a0295cc214d39f4d066ec9e7a59020343d588364e9472cd849666c0302033652d354d7291195f60d4cfa32b9451bab6d550d54701",
+      "sequence": 0,
+      "sigOpCount": 0,
+      "computeBudget": 10,
+      "verboseData": null
+    }
+  ],
+  "outputs": [
+    {
+      "value": 981758827250,
+      "scriptPublicKey": "00002080277ad8332a36331608d3085e5aed0ceb00b2449adbefbf4ad01d98803cb53cac",
+      "verboseData": null,
+      "covenant": null
+    }
+  ],
+  "lockTime": 0,
+  "subnetworkId": "0000000000000000000000000000000000000000",
+  "gas": 0,
+  "payload": "",
+  "storageMass": 0,
+  "mass": 0,
+  "verboseData": null
+}

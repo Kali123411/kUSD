@@ -1,0 +1,568 @@
+// kUSD v2 CDP vault — USD-denominated debt against KAS collateral.
+//
+// The debt unit is USD cents held in kUSD covenant STATE (value != amount):
+// the peg-critical decoupling that v1 could not express. The vault:
+//   * reads the price from the committee oracle (pinned by COVID in state —
+//     the template alone is forgeable),
+//   * fully pins the kUSD family transition of every entry via `observes`
+//     (the kusd authority's `emission` entry relies on this — see kusd.ag's
+//     INVARIANT: every vault entry must observe and pin the kusd group),
+//   * keeps `self.value >= TOMBSTONE + collateral` so seized collateral is
+//     always physically present (surplus above that pays emitted-box dust
+//     and fees).
+//
+// Health check (v1 parameter review P4: MIN_RATIO 175):
+//   collateral_usd_cents = usd_cents_of(collateral, price)   (oracle.ag; price in 1e-4 USD/KAS)
+//   healthy  iff collateral_usd_cents * 100 >= debt_cents * MIN_RATIO
+// Bounds keep every product under 2^62: collateral <= 4e12 sompi (40k KAS),
+// price <= 1e8 (oracle MAX_PRICE, $10k/KAS in 1e-4 USD units), debt <= 4e10 cents ($400M — sized so
+// liquidate's seize math (debt*113/100)*1e8 stays in i64; audit M1: an
+// unhealthy large vault must stay liquidatable).
+
+import "./kusd.ag";
+import "./oracle.ag";
+import "./surplus.ag";
+import "./budget.ag";
+
+const int TOMBSTONE = 100000000;             // sompi floor of the vault box (KIP-9)
+const int MAX_COLLATERAL = 4000000000000;    // 40,000 KAS per vault
+const int MIN_COLLATERAL = 200000000;        // 2 KAS: freed collateral always clears
+                                             // the KIP-9 floor (review I4)
+const int MIN_DEBT = 100;                    // $1 — no dust debt (review I4)
+const int MAX_DEBT = 40000000000;            // 4e10 cents ($400M per vault)
+const int MIN_RATIO = 175;                   // percent (v1 param review P4)
+const int KEEPER_BPS = 11000;                // liquidation: keeper takes 110% of debt
+const int SURPLUS_BPS = 300;                 // liquidation: surplus takes 3% of debt
+// (together: the v1 13% penalty, split keeper 10 / surplus 3; keeper first when capped)
+
+state VaultState {
+    byte[32] owner;      // x-only pubkey; also the owner of emitted kUSD
+    int collateral;      // sompi, mirrored by box value (value >= TOMBSTONE + collateral)
+    int debt;            // USD cents
+    cov_id kusd_id;      // the kUSD covenant group (authority + circulating)
+    cov_id oracle_id;    // the genuine oracle singleton
+    cov_id surplus_id;   // the governance surplus box (liquidation-split destination)
+    cov_id budget_id;    // the global mint budget (token bucket metering every issuance)
+}
+
+actor Vault owns VaultState {
+    // Mint `d` cents of kUSD against this vault's collateral.
+    // tx: inputs [vault, kusd_authority, oracle, budget, ...] -> outputs [vault', auth', emitted, oracle', budget']
+    entry mint(int d, sig owner_sig, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+            emitted: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Vault {
+        // review C1: this entry is the tx's ONLY kusd-burn/mint observer —
+        // pin the (singleton) vault lineage to transaction input 0 so two
+        // emitter entries can never share one burn
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(checkSig(owner_sig, pubkey(owner)));
+        require(d > 0);
+        require(debt >= 0);   // genesis state is attacker-chosen (review I3)
+        require(collateral >= MIN_COLLATERAL);   // review I4: dust vaults are unliquidatable
+        require(collateral <= MAX_COLLATERAL);
+        int new_debt = debt + d;
+        require(new_debt >= MIN_DEBT);
+        require(new_debt <= MAX_DEBT);
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        require(a.amount >= d);
+
+        OracleState o = state(oracle.inputs.ora);
+        require(o.status == STATUS_LIVE);   // no minting on a frozen or settled feed
+        require(o.mint_price > 0);
+        require(o.mint_price <= MAX_PRICE);
+        int collateral_usd_cents = usd_cents_of(collateral, o.mint_price);
+        require(collateral_usd_cents * 100 >= new_debt * MIN_RATIO);
+
+        // global issuance velocity: the budget's continuation is pinned to the
+        // same token-bucket transition with THIS mint's d
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int avail = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now);
+        require(d <= avail);
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: avail - d,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        KusdState auth_after = {
+            amount: a.amount - d,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        KusdState minted = {
+            amount: d,
+            owner: owner,
+            owner_scheme: 0x00,
+            borrow_scheme: 0,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+            emitted <- KusdApp::Kusd(minted),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        VaultState next_state = {
+            owner: owner,
+            collateral: collateral,
+            debt: new_debt,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        require(next.value >= TOMBSTONE + collateral);
+        become next <- Vault(next_state);
+    }
+
+    // Burn `r` cents from a holder box owned by the vault owner; debt drops,
+    // un-issued supply returns to the authority. While debt remains the
+    // collateral is frozen; once debt hits 0 the owner may release it
+    // (v1 parity, review I4 — the owner signs, so the freed value is theirs
+    // to direct).
+    // tx: inputs [vault, kusd_authority, kusd_holder] -> outputs [vault', auth']
+    entry repay(int r, int next_collateral, sig owner_sig, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+            holder: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Vault {
+        // review C1: this entry is the tx's ONLY kusd-burn/mint observer —
+        // pin the (singleton) vault lineage to transaction input 0 so two
+        // emitter entries can never share one burn
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(checkSig(owner_sig, pubkey(owner)));
+        require(r > 0);
+        require(r <= debt);
+        require(next_collateral >= 0);
+        if (debt - r > 0) {
+            require(next_collateral == collateral);
+            require(debt - r >= MIN_DEBT);   // review I4: no dust debt remainder
+        }
+        if (debt - r == 0) {
+            require(next_collateral <= collateral);
+        }
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState h = state(kusd.inputs.holder);
+        require(h.owner_scheme == 0x00);
+        require(h.owner == owner);
+        require(h.amount == r);
+
+        // net metering (review I-2): the burn refunds issuance headroom
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int refunded = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now) + r;
+        if (refunded > bs.daily_limit) { refunded = bs.daily_limit; }
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: refunded,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        KusdState auth_after = {
+            amount: a.amount + r,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+        };
+
+        VaultState next_state = {
+            owner: owner,
+            collateral: next_collateral,
+            debt: debt - r,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        require(next.value >= TOMBSTONE + next_collateral);
+        become next <- Vault(next_state);
+    }
+
+    // Owner-signed collateral adjust: deposit (delta > 0) or withdraw
+    // (delta < 0, health must hold at the oracle price). The kusd family is
+    // co-spent FROZEN — supply cannot move under this entry (the emission
+    // gate relies on it; see kusd.ag INVARIANT).
+    // tx: [vault, kusd_authority, oracle] -> [vault', auth'(unchanged), oracle']
+    entry adjust(int delta, sig owner_sig)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    emits next: Vault {
+        // review C1: this entry is the tx's ONLY kusd-burn/mint observer —
+        // pin the (singleton) vault lineage to transaction input 0 so two
+        // emitter entries can never share one burn
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(OpCovInputCount(budget_id) == 0);   // the budget meters issuance only: a burn tx
+                                                    // can't co-spend it to drain the bucket
+        require(checkSig(owner_sig, pubkey(owner)));
+        require(delta != 0);
+        require(debt >= 0);
+        int new_collateral = collateral + delta;
+        require(new_collateral >= MIN_COLLATERAL);   // review I4
+        require(new_collateral <= MAX_COLLATERAL);
+
+        OracleState o = state(oracle.inputs.ora);
+        if (delta < 0) {
+            // withdrawals only on a LIVE feed, health at the low-biased mint price;
+            // deposits are always allowed (even frozen, even while unhealthy)
+            require(o.status == STATUS_LIVE);
+            require(o.mint_price > 0);
+            require(o.mint_price <= MAX_PRICE);
+            int collateral_usd_cents = usd_cents_of(new_collateral, o.mint_price);
+            require(collateral_usd_cents * 100 >= debt * MIN_RATIO);
+        }
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState frozen = {
+            amount: a.amount,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(frozen),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        VaultState next_state = {
+            owner: owner,
+            collateral: new_collateral,
+            debt: debt,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        require(next.value >= TOMBSTONE + new_collateral);
+        become next <- Vault(next_state);
+    }
+
+    // Permissionless liquidation of an UNHEALTHY vault (no owner sig). The
+    // liquidator burns kUSD equal to the debt (consenting via burner_sig),
+    // seizes collateral worth debt*(100+PENALTY)% at the oracle price (capped
+    // at freed collateral), and the owner keeps the remainder in the closed
+    // vault (v1 param review P2/P3: no solvency gate, no full confiscation).
+    // tx: inputs  [vault, kusd_authority, kusd_holder, oracle]
+    //     outputs [vault'(closed), auth'(+debt), payout(P2PK burner), oracle']
+    entry liquidate(sig burner_sig, int clock_idx)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+            holder: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    observes oracle by self.oracle_id {
+        inputs {
+            ora: OracleApp::Oracle,
+        }
+
+        outputs {
+            ora_next: OracleApp::Oracle,
+        }
+    }
+    observes surplus by self.surplus_id {
+        inputs {
+            s: SurplusApp::Surplus,
+        }
+
+        outputs {
+            s_next: SurplusApp::Surplus,
+        }
+    }
+    observes budget by self.budget_id {
+        inputs {
+            b: BudgetApp::Budget,
+        }
+
+        outputs {
+            b_next: BudgetApp::Budget,
+        }
+    }
+    emits next: Vault {
+        // review C1: this entry is the tx's ONLY kusd-burn/mint observer —
+        // pin the (singleton) vault lineage to transaction input 0 so two
+        // emitter entries can never share one burn
+        require(OpCovInputIdx(self.cov_id, 0) == 0);
+        require(debt > 0);
+        require(debt <= MAX_DEBT);
+        require(collateral > 0);
+        require(collateral <= MAX_COLLATERAL);
+
+        OracleState o = state(oracle.inputs.ora);
+        require(o.status == STATUS_LIVE);   // no liquidations on a frozen or settled feed
+        require(o.liq_price > 0);
+        require(o.liq_price <= MAX_PRICE);
+        int collateral_usd_cents = usd_cents_of(collateral, o.liq_price);
+        require(collateral_usd_cents * 100 < debt * MIN_RATIO);   // UNHEALTHY at the high-biased price
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState h = state(kusd.inputs.holder);
+        require(h.owner_scheme == 0x00);
+        require(h.amount == debt);
+        require(checkSig(burner_sig, pubkey(h.owner)));   // burner consents
+
+        // net metering (review I-2): the burn refunds issuance headroom
+        BudgetState bs = state(budget.inputs.b);
+        int now = OpTxInputDaaScore(clock_idx);
+        require(now >= bs.last_refill);
+        int refunded = budget_refill(bs.daily_limit, bs.available, bs.last_refill, now) + debt;
+        if (refunded > bs.daily_limit) { refunded = bs.daily_limit; }
+        BudgetState b_after = {
+            daily_limit: bs.daily_limit,
+            available: refunded,
+            last_refill: now,
+            kusd_id: bs.kusd_id,
+            g0: bs.g0,
+            g1: bs.g1,
+            g2: bs.g2,
+        };
+        require budget.outputs become {
+            b_next <- BudgetApp::Budget(b_after),
+        };
+
+        KusdState auth_after = {
+            amount: a.amount + debt,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(auth_after),
+        };
+
+        OracleState o_next = {
+            price: o.price,
+            mint_price: o.mint_price,
+            liq_price: o.liq_price,
+            epoch: o.epoch,
+            last_update: o.last_update,
+            status: o.status,
+            m0: o.m0,
+            m1: o.m1,
+            m2: o.m2,
+            m3: o.m3,
+            m4: o.m4,
+        };
+        require oracle.outputs become {
+            ora_next <- OracleApp::Oracle(o_next),
+        };
+
+        // penalty split: keeper 110% of debt, surplus 3%; keeper first when
+        // freed collateral caps the seizure
+        int keeper_sompi = sompi_of(debt * KEEPER_BPS / 10000, o.liq_price);
+        int surplus_sompi = sompi_of(debt * SURPLUS_BPS / 10000, o.liq_price);
+        int freed_max = collateral - TOMBSTONE;
+        if (keeper_sompi > freed_max) { keeper_sompi = freed_max; }
+        // review I4: the pinned payout must clear the KIP-9 storage-mass floor;
+        // MIN_COLLATERAL guarantees freed_max >= TOMBSTONE
+        if (keeper_sompi < TOMBSTONE) { keeper_sompi = TOMBSTONE; }
+        if (keeper_sompi > freed_max) { keeper_sompi = freed_max; }
+        if (surplus_sompi > freed_max - keeper_sompi) { surplus_sompi = freed_max - keeper_sompi; }
+        require(keeper_sompi > 0);
+        require(surplus_sompi >= 0);
+        int closed_collateral = collateral - keeper_sompi - surplus_sompi;
+
+        // the surplus continuation (covid-pinned by the observe) takes exactly
+        // the split; its position comes from the covenant group itself
+        SurplusState s_state = state(surplus.inputs.s);
+        SurplusState s_after = {
+            g0: s_state.g0,
+            g1: s_state.g1,
+            g2: s_state.g2,
+            kusd_id: s_state.kusd_id,
+        };
+        require surplus.outputs become {
+            s_next <- SurplusApp::Surplus(s_after),
+        };
+        int s_out_idx = OpCovOutputIdx(surplus_id, 0);
+        require(tx.outputs[s_out_idx].value == surplus.inputs.s.value + surplus_sompi);
+
+        // forced keeper payout at a fixed output position:
+        // [0] vault', [1] auth', [2] payout, then surplus'/oracle'
+        require(tx.outputs[2].value == keeper_sompi);
+        require(tx.outputs[2].scriptPubKey == byte[](new ScriptPubKeyP2PK(pubkey(h.owner))));
+
+        VaultState next_state = {
+            owner: owner,
+            collateral: closed_collateral,
+            debt: 0,
+            kusd_id: kusd_id,
+            oracle_id: oracle_id,
+            surplus_id: surplus_id,
+            budget_id: budget_id,
+        };
+        require(next.value >= TOMBSTONE + closed_collateral);
+        become next <- Vault(next_state);
+    }
+
+    // Terminal entry: a debt-free vault's owner ends the lineage and takes
+    // everything (tombstone + remaining collateral). The kusd family is
+    // co-spent FROZEN — without this, an `emission` could ride a close (the
+    // gate cannot see which vault entry ran; kusd.ag INVARIANT).
+    // tx: [vault(close), kusd_authority] -> [auth'(unchanged), ...release]
+    entry close(sig owner_sig)
+    observes kusd by self.kusd_id {
+        inputs {
+            auth: KusdApp::Kusd,
+        }
+
+        outputs {
+            auth_next: KusdApp::Kusd,
+        }
+    }
+    emits none {
+        require(OpCovInputIdx(self.cov_id, 0) == 0);   // review C1
+        require(OpCovInputCount(budget_id) == 0);   // the budget meters issuance only: a burn tx
+                                                    // can't co-spend it to drain the bucket
+        require(debt == 0);
+        require(checkSig(owner_sig, pubkey(owner)));
+
+        KusdState a = state(kusd.inputs.auth);
+        require(a.owner_scheme == 0x10);
+        KusdState frozen = {
+            amount: a.amount,
+            owner: a.owner,
+            owner_scheme: a.owner_scheme,
+            borrow_scheme: a.borrow_scheme,
+            borrow_guard: a.borrow_guard,
+            extension_commitment: a.extension_commitment,
+        };
+        require kusd.outputs become {
+            auth_next <- KusdApp::Kusd(frozen),
+        };
+    }
+}
+
+app VaultApp {
+    actor Vault;
+}

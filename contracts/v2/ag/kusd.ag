@@ -1,0 +1,362 @@
+// kUSD v2 token — KCC-20 fungible covenant with amounts in STATE (USD cents),
+// decoupled from box value (sompi).
+//
+// Phase 4: the transfer interface IS the KCC-20 reference ABI (witness-blob
+// dispatch per KCC-1/KCC-2; vendored semantic source:
+// contracts/v2/vendor/kcc20/kcc20.ag): owner schemes 0x00–0x04 (KCC-2), borrow
+// schemes 0x00–0x03, path selector in the leader witness, self-authorizing
+// transfer_delegator. kUSD extensions, declared in the conformance table:
+//   * owner_scheme 0x10 marks the supply-authority box (out of KCC-2's range so
+//     standards-following wallets treat it as nonstandard). It is frozen under
+//     `transfer`, unreachable via the borrow path, unusable as a delegate, and
+//     only changes via `emission` (gated) and `rotate`.
+//   * every output's value >= DUST (KIP-9 storage-mass floor convention).
+// The check-free `join` delegate is REMOVED (argent leader-delegate invariant
+// Property 7: delegation authenticates the actor, not the entry) — every
+// co-spent kUSD input self-authorizes through `transfer_delegator`, including
+// burn holders under `emission`.
+//
+// The emission/burn gate authenticates a co-spent emitter's full WIRING, not
+// just its code (review findings C1/C2), for TWO emitter kinds:
+//   * `extension_commitment = blake3(vault_template || psm_template ||
+//     oracle_covid || psm_covid || surplus_covid || budget_covid)` — a 192-byte config frozen at authority
+//     genesis. The preimage arrives as witness args and is hash-checked.
+//     Vaults are referenced by TEMPLATE (permissionless); the oracle AND THE
+//     PSM INSTANCE are pinned by COVID (review C-1). The psm geneses UNWIRED
+//     (kusd_id = 0) before the authority and is wired once by governance.
+//   * the gate's `kusd_id` must equal THIS group's covid;
+//   * the gate's `oracle_id` must equal the config's oracle covid;
+//   * a PSM gate's input covid must equal the config's psm covid.
+//
+// INVARIANT the gate relies on: every entry of the vault AND psm contracts
+// observes and fully pins the covenant group its state's kusd_id names
+// (supply-frozen where the entry does not change supply).
+
+const int DUST = 100000000;                      // KIP-9 storage-mass floor convention
+const int MAX_AMOUNT = 4611686018427387904;      // 2^62 — headroom under KCC-20's 2^63-1
+
+// KCC-2 owner schemes (contiguous from zero) + the kUSD authority extension.
+const byte OWNER_P2PK_SCHNORR = 0x00;
+const byte OWNER_P2PKH_SCHNORR = 0x01;
+const byte OWNER_P2PKH_ECDSA = 0x02;
+const byte OWNER_P2SH = 0x03;
+const byte OWNER_COVENANT_ID = 0x04;
+const byte OWNER_AUTHORITY = 0x10;               // kUSD extension: supply singleton
+
+// KCC-20 transfer paths and borrow schemes.
+const byte PATH_NORMAL = 0x00;
+const byte PATH_BORROW = 0x01;
+const byte BORROW_DISABLED = 0x00;
+const byte BORROW_AMOUNT_THRESHOLD = 0x01;
+const byte BORROW_SCHNORR_SIGNATURE = 0x02;
+const byte BORROW_HASH_CHAIN = 0x03;
+
+// Unsigned bounds: signed() on bytes >= 0x80 goes negative (vendored kcc20.ag
+// note) — compare in the 0..255 domain.
+fn require_valid_owner_scheme(byte owner_scheme) {
+    require(unsigned(owner_scheme) <= unsigned(OWNER_COVENANT_ID));
+}
+
+fn require_valid_borrow_scheme(byte borrow_scheme) {
+    require(unsigned(borrow_scheme) <= unsigned(BORROW_HASH_CHAIN));
+}
+
+// kUSD deviation D4 (review I3): OWNER_COVENANT_ID (0x04) is presence-as-
+// consent — unsafe in a protocol whose covenants all carry permissionless
+// entries (oracle peek, surplus receive, the kusd group itself). kUSD boxes
+// can never be CREATED with scheme 0x04.
+fn require_valid_output_owner_scheme(byte owner_scheme) {
+    require(unsigned(owner_scheme) <= unsigned(OWNER_P2SH));
+}
+
+fn p2pkh_hash(byte[] public_key) -> byte[32] {
+    return blake3(public_key);
+}
+
+// KCC-2 owner authorization over a path-stripped witness (vendored verbatim).
+fn require_owner_authorized(
+    byte[32] owner,
+    byte owner_scheme,
+    byte[] witness
+) {
+    if (owner_scheme == OWNER_P2PK_SCHNORR) {
+        // byte[65] conversion implicitly validates the witness length
+        require(checkSig(
+            sig(byte[65](witness)),
+            pubkey(owner)
+        ));
+    } else if (owner_scheme == OWNER_P2PKH_SCHNORR) {
+        require(witness.length == 97);
+
+        pubkey owner_public_key = pubkey(byte[32](witness.slice(0, 32)));
+        sig owner_signature = sig(byte[65](witness.slice(32, 97)));
+        require(p2pkh_hash(byte[](owner_public_key)) == owner);
+        require(checkSig(owner_signature, owner_public_key));
+    } else if (owner_scheme == OWNER_P2PKH_ECDSA) {
+        require(witness.length == 98);
+
+        byte[33] owner_public_key = byte[33](witness.slice(0, 33));
+        sig owner_signature = sig(byte[65](witness.slice(33, 98)));
+        require(p2pkh_hash(byte[](owner_public_key)) == owner);
+        require(checkSigEcdsa(owner_signature, owner_public_key));
+    } else if (owner_scheme == OWNER_P2SH) {
+        require(witness.length == 1);
+        int authority_input_index = unsigned(witness[0]);
+        require(
+            tx.inputs[authority_input_index].scriptPubKey
+                == byte[](new ScriptPubKeyP2SH(owner))
+        );
+    } else if (owner_scheme == OWNER_COVENANT_ID) {
+        require(witness.length == 0);
+        require(OpCovInputCount(owner) > 0);
+    } else {
+        require(false);
+    }
+}
+
+state KusdState {
+    int amount;                      // USD cents
+    byte[32] owner;                  // per owner_scheme (KCC-2), or the governance key (0x10)
+    byte owner_scheme;               // KCC-2 0x00–0x04, or 0x10 = authority (kUSD extension)
+    byte borrow_scheme;              // KCC-20 0x00–0x03
+    byte[32] borrow_guard;           // per borrow_scheme
+    byte[32] extension_commitment;   // blake3 gate config (emission gate; see header)
+}
+
+// Mirrors of the emitters' state layouts, used ONLY to type the gate reads
+// in `emission`. Field types/order MUST match vault.ag's VaultState and
+// psm.ag's PsmState exactly — a layout change there cascades here (and
+// changes that emitter's template hash, hence the gate config).
+state VaultGate {
+    byte[32] owner;
+    int collateral;
+    int debt;
+    byte[32] kusd_id;
+    byte[32] oracle_id;
+    byte[32] surplus_id;
+    byte[32] budget_id;
+}
+
+state PsmGate {
+    int ceiling_cents;
+    int minted_cents;
+    int spread_bps;
+    pubkey g0;
+    pubkey g1;
+    pubkey g2;
+    byte[32] kusd_id;
+    byte[32] oracle_id;
+    byte[32] surplus_id;
+    byte[32] budget_id;
+}
+
+actor Kusd owns KusdState {
+    // KCC-20 transfer: the leader witness is `path ++ path_witness`; delegates
+    // self-authorize through `transfer_delegator` against their own sighash.
+    entry transfer(KusdState[] next_states, byte[] witness)
+    consumes {
+        delegates: Kusd[0..=2],
+    }
+    emits {
+        next_outputs: Kusd[1..=3],
+    } {
+        require(next_states.length == next_outputs.length);
+        require(witness.length > 0);
+
+        // Sum the token amounts of all inputs, starting with the leader's.
+        int input_total = amount;
+        for (i, 0, delegates.length, 2) {
+            require(delegates[i].extension_commitment == extension_commitment);
+            // the authority never rides as a delegate (its continuation rules
+            // live in its own leader entries)
+            require(delegates[i].owner_scheme != OWNER_AUTHORITY);
+            input_total = input_total + delegates[i].amount;
+        }
+
+        // Authority leader: frozen continuation at next_outputs[0] (supply and
+        // custody move only through `emission`/`rotate`).
+        if (owner_scheme == OWNER_AUTHORITY) {
+            require(next_states[0].owner_scheme == OWNER_AUTHORITY);
+            require(next_states[0].amount == amount);
+            require(next_states[0].owner == owner);
+            require(next_outputs[0].value >= self.value);
+        }
+
+        int output_total = 0;
+        for (j, 0, next_states.length, 3) {
+            require(next_states[j].amount >= 0);
+            require(next_states[j].amount < MAX_AMOUNT);
+            if (j > 0 || owner_scheme != OWNER_AUTHORITY) {
+                require_valid_output_owner_scheme(next_states[j].owner_scheme);
+            }
+            require_valid_borrow_scheme(next_states[j].borrow_scheme);
+            require(next_states[j].extension_commitment == extension_commitment);
+            require(next_outputs[j].value >= DUST);   // kUSD extension (KIP-9 floor)
+            output_total = output_total + next_states[j].amount;
+        }
+        require(output_total == input_total);
+
+        // Only the leader witness carries a path selector.
+        byte path = witness[0];
+        byte[] path_witness = witness.slice(1, witness.length);
+
+        if (path == PATH_NORMAL) {
+            if (owner_scheme == OWNER_AUTHORITY) {
+                require(checkSig(sig(byte[65](path_witness)), pubkey(owner)));
+            } else {
+                require_owner_authorized(owner, owner_scheme, path_witness);
+            }
+        } else if (path == PATH_BORROW) {
+            require(owner_scheme != OWNER_AUTHORITY);
+
+            int amount_threshold = 0;
+            byte[32] next_borrow_guard = borrow_guard;
+
+            if (borrow_scheme == BORROW_DISABLED) {
+                require(false);
+            } else if (borrow_scheme == BORROW_AMOUNT_THRESHOLD) {
+                require(path_witness.length == 0);
+                amount_threshold = int(byte[8](borrow_guard.slice(0, 8)));
+                // Negative thresholds behave as zero; borrowing still requires an increase.
+                if (amount_threshold < 0) {
+                    amount_threshold = 0;
+                }
+            } else if (borrow_scheme == BORROW_SCHNORR_SIGNATURE) {
+                // byte[65] conversion implicitly validates the witness length
+                require(checkSig(
+                    sig(byte[65](path_witness)),
+                    pubkey(borrow_guard)
+                ));
+            } else if (borrow_scheme == BORROW_HASH_CHAIN) {
+                require(path_witness.length == 129);
+
+                next_borrow_guard = byte[32](path_witness.slice(0, 32));
+                pubkey one_time_public_key = pubkey(byte[32](
+                    path_witness.slice(32, 64)
+                ));
+                sig borrow_signature = sig(byte[65](
+                    path_witness.slice(64, 129)
+                ));
+
+                // The current guard commits to the next guard and its signing key.
+                require(
+                    blake3(byte[](
+                        next_borrow_guard + byte[](one_time_public_key)
+                    )) == borrow_guard
+                );
+                require(checkSig(borrow_signature, one_time_public_key));
+            } else {
+                require(false);
+            }
+
+            // Return the borrowed state to its owner with the expected guard.
+            require(next_states[0].owner == owner);
+            require(next_states[0].owner_scheme == owner_scheme);
+            require(next_states[0].borrow_scheme == borrow_scheme);
+            require(next_states[0].borrow_guard == next_borrow_guard);
+
+            // Increase tokens without reducing the borrowed input's sompi.
+            int amount_increase = next_states[0].amount - amount;
+            require(amount_increase > amount_threshold);
+            require(next_outputs[0].value >= self.value);
+        } else {
+            require(false);
+        }
+
+        become next_outputs <- Kusd[](next_states);
+    }
+
+    // Each co-spent kUSD input authorizes itself (no path selector): transfer
+    // siblings AND burn holders under `emission`.
+    delegate transfer_delegator(byte[] witness)
+    consumes {
+        leader: Kusd,
+    } {
+        require_owner_authorized(owner, owner_scheme, witness);
+    }
+
+    // Authority leader entry for supply-changing transactions (vault
+    // mint/repay/liquidate, psm swap_in/swap_out): a genuine emitter whose
+    // template is named by the anchored config must co-spend at gate_idx,
+    // wired to THIS token group and to the anchored oracle (C1/C2). The
+    // emitter's own entry pins every amount delta in this family; this entry
+    // pins the gate, structure, custody flags, and bounds.
+    entry emission(KusdState[] new_states, int gate_idx, int gate_prefix_len, int gate_suffix_len, byte[32] cfg_vault_template, byte[32] cfg_psm_template, byte[32] cfg_oracle_covid, byte[32] cfg_psm_covid, byte[32] cfg_surplus_covid, byte[32] cfg_budget_covid, bool gate_is_psm)
+    consumes {
+        others: Kusd[0..=2],
+    }
+    emits {
+        next: Kusd[1..=3],
+    } {
+        require(owner_scheme == OWNER_AUTHORITY);
+        require(blake3(byte[](cfg_vault_template) + byte[](cfg_psm_template) + byte[](cfg_oracle_covid) + byte[](cfg_psm_covid) + byte[](cfg_surplus_covid) + byte[](cfg_budget_covid)) == extension_commitment);
+        if (gate_is_psm) {
+            PsmGate pgate = readInputStateWithTemplate(gate_idx, gate_prefix_len, gate_suffix_len, cfg_psm_template);
+            require(OpInputCovenantId(gate_idx) == cfg_psm_covid);   // THE instance, not just the code (C-1)
+            require(pgate.minted_cents >= 0);
+            require(pgate.kusd_id == self.cov_id);
+            require(pgate.oracle_id == cfg_oracle_covid);
+            require(pgate.surplus_id == cfg_surplus_covid);   // review C2
+            require(pgate.budget_id == cfg_budget_covid);     // phase 5: the one budget
+        }
+        if (gate_is_psm == false) {
+            VaultGate gate = readInputStateWithTemplate(gate_idx, gate_prefix_len, gate_suffix_len, cfg_vault_template);
+            require(gate.debt >= 0);
+            require(gate.kusd_id == self.cov_id);
+            require(gate.oracle_id == cfg_oracle_covid);
+            require(gate.budget_id == cfg_budget_covid);     // phase 5: an attacker-authored
+            // budget_id would let a vault mint outside the global budget
+            require(gate.surplus_id == cfg_surplus_covid);   // review C2: an attacker-
+            // authored surplus_id would make the vault unliquidatable (or evade the
+            // penalty split) — no such vault may ever create or move debt
+        }
+
+        require(new_states.length == next.length);
+        // authority continuation is next[0]: same owner/scheme, amount set by the vault
+        require(new_states[0].owner_scheme == OWNER_AUTHORITY);
+        require(new_states[0].owner == owner);
+        require(next[0].value >= self.value);    // no draining the authority box
+
+        for (i, 0, others.length, 2) {
+            // consumed holder boxes (burns) are plain balances; they
+            // self-authorize via transfer_delegator and the emitter checks
+            // burn consent
+            require(others[i].owner_scheme != OWNER_AUTHORITY);
+        }
+
+        for (j, 0, new_states.length, 3) {
+            require(new_states[j].amount >= 0);
+            require(new_states[j].amount < MAX_AMOUNT);
+            if (j > 0) {
+                require(new_states[j].owner_scheme == OWNER_P2PK_SCHNORR);
+            }
+            require(new_states[j].borrow_scheme == BORROW_DISABLED);
+            require(new_states[j].borrow_guard == borrow_guard);
+            require(new_states[j].extension_commitment == extension_commitment);
+            require(next[j].value >= DUST);
+        }
+
+        become next <- Kusd[](new_states);
+    }
+
+    // Governance key rotation for the supply singleton: the current authority
+    // owner hands the box to a new key; everything else is preserved.
+    entry rotate(byte[32] new_owner, sig owner_sig) emits next: Kusd {
+        require(owner_scheme == OWNER_AUTHORITY);
+        require(checkSig(owner_sig, pubkey(owner)));
+        KusdState next_state = {
+            amount: amount,
+            owner: new_owner,
+            owner_scheme: owner_scheme,
+            borrow_scheme: borrow_scheme,
+            borrow_guard: borrow_guard,
+            extension_commitment: extension_commitment,
+        };
+        require(next.value >= self.value);
+        become next <- Kusd(next_state);
+    }
+}
+
+app KusdApp {
+    actor Kusd;
+}
