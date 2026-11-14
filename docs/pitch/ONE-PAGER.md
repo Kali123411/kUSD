@@ -52,7 +52,7 @@ not a token sale, and it confers no claim.
 
 ## Verify every word
 
-- Code + tests + whitepaper: `[MIRROR-URL — public repo at publication]`
+- Code + tests + whitepaper: https://github.com/Kali123411/kUSD
 - Every cited transaction: archived serialized in `docs/pitch/evidence/`
   (verifiable against the node's own covenant engine, even after TN10 resets)
 - 116 tests including every review attack as a regression:

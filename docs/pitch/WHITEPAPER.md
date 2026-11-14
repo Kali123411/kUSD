@@ -3,7 +3,7 @@
 **Technical whitepaper & funding prospectus — DRAFT (Phase 4)**
 Status: TN10 testnet research. **Not audited. Not a product. Not for real value.**
 Every claim in this document is traceable to code, tests, or an on-chain
-transaction; sources are cited inline. Repo: `[MIRROR-URL — set at publication]`.
+transaction; sources are cited inline. Repo: https://github.com/Kali123411/kUSD.
 
 ---
 
