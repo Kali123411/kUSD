@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T16:39:13Z",
+  "generatedAt": "2026-11-15T18:23:46Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,78 +7,78 @@
   "covenants": {
     "oracle": {
       "covid": "dea6a1d33aae1335f57656845add90a22d7f179e695a97e183ce696be4e88314",
-      "txid": "547fd40bc86720bc373defcb76371e706a8eb51c4675fdd7c666da71b9be617e",
+      "txid": "022982f60d23157b1ed311661f425d9bffc3d4bbf7be2cd8b88bdcc925c98ed8",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 270,
-        "mint": 270,
+        "mint": 237,
         "liq": 270,
-        "epoch": 39,
-        "last": 624247118,
+        "epoch": 44,
+        "last": 624310057,
         "status": 0
       },
-      "address": "kaspatest:pqkxgeqd3fs60939ym46j3t20x2mtyhnapsjg574kkcff9ghnwaczgk4dhyhm"
+      "address": "kaspatest:pq5kgyd8u6tlksn0gagkq4a2caxa39ggmjma0qdvmpxan59h05lkc6ju7najx"
     },
     "budget": {
-      "covid": "d483a76e2b8a2d24bc9c1d7781a84c7ffb2cde6bf553d840a5501710ddc9e316",
-      "txid": "09c442de3524dc494e4d1e2a0ba1ea0b25a72da5d506b7aceab979e0b52b7fa1",
+      "covid": "f22bd27f6e9cd2ad2d807f18aa0cc0944460b2bffa291b9ecc48a8965210b2be",
+      "txid": "d68f31d9dfb052eb5ce8eb0b2f640caead0ecef1a77e3af1b591fe1a96daf638",
       "index": 6,
       "amount": 100000000,
       "state": {
         "limit": 5000000,
         "available": 5000000,
-        "last": 624234868
+        "last": 624303372
       },
-      "address": "kaspatest:ppxew4ls9avmkk2309h8ypuahj0pnlarlaz59wt4gnzyw0lstmpp5dzc4r2yx"
+      "address": "kaspatest:prd5da576c2tps32mtflhvz89m0578krvte65dqgnmsu5fy0v0kryx7y257d4"
     },
     "psm": {
-      "covid": "d7feb7c3d5e5d272ed1ba18d8a26125ba73ca5aa51b1f40bafc262612a6ce270",
-      "txid": "09c442de3524dc494e4d1e2a0ba1ea0b25a72da5d506b7aceab979e0b52b7fa1",
+      "covid": "0f8723fab38bdec464ad37114bfce28216ccb1d6429d9e68eb3798f895402785",
+      "txid": "d68f31d9dfb052eb5ce8eb0b2f640caead0ecef1a77e3af1b591fe1a96daf638",
       "index": 0,
-      "amount": 64310700000,
+      "amount": 14801350000,
       "state": {
         "ceiling": 5000000,
-        "minted": 1700
+        "minted": 0
       },
-      "address": "kaspatest:pq077qd3japg7zysxer9zz9ztvqnpfacc8af2yz3g25r6fz7vdhcsyxd4yu9t"
+      "address": "kaspatest:pp8jchu0gdpc8y47hevx30jxjj4z7lckv9u0t5ewsu2jf6e6qhersgdq7kl06"
     },
     "vault": {
-      "covid": "a28396e1095d48946e296bc169b8c4b7d57bc65bef66b7c422a99ced23beec02",
-      "txid": "0e2dba7fbbae88ea5ba798c2a7c41e4b1ff0c5f87ea145b5d53919b686d79cf0",
+      "covid": "8dea4f7f090c55b395fc61499c9b8c207c31daa1e135a7c1bfc35546404b7f96",
+      "txid": "494a03e83ec5a01cc1cda06ed76669ea59727ce05d8c0c0d3a53f99694ed765e",
       "index": 0,
-      "amount": 30290000000,
+      "amount": 30100000000,
       "state": {
         "collateral": 30000000000,
         "debt": 200
       },
-      "address": "kaspatest:pzgxsgugfnlp0fzd3yad8vhcm9aj9dx7rage4pxgsnr06vg5chhx5whpu0haj"
+      "address": "kaspatest:pzc8d0n8qcr7mu5qdtj3sw7nr5q4mnutvwpc30qh5ex46av9zya4zj6p7y0cz"
     },
     "authority": {
-      "covid": "1dc5238256f24fad172629127ea31cf75e917418ec7c9af798addd2426ce2fd0",
-      "txid": "09c442de3524dc494e4d1e2a0ba1ea0b25a72da5d506b7aceab979e0b52b7fa1",
-      "index": 1,
+      "covid": "bd6b2d393f00e87babe61b5ca16732b5191f075425f2b6fc6f89f3f3c668721d",
+      "txid": "73f2251e45ba8864496d676dba05c373afae4af4711aa71c6fe3e64b024b8c18",
+      "index": 0,
       "amount": 190000000,
       "state": {
-        "amount": 99997300
+        "amount": 99999800
       },
-      "address": "kaspatest:pr64prmcwfw7kc348rz7xtgvh2tajucq7ddzyxy43l0ja5e2hpdrswn2sdlty"
+      "address": "kaspatest:prpwk9q3aaq2h2ss64grqqj6l4vcuj4p79a97ff3uy2tnd2hj5g9yx8j87f3t"
     },
     "minted": {
-      "covid": "1dc5238256f24fad172629127ea31cf75e917418ec7c9af798addd2426ce2fd0",
-      "txid": "0e2dba7fbbae88ea5ba798c2a7c41e4b1ff0c5f87ea145b5d53919b686d79cf0",
+      "covid": "bd6b2d393f00e87babe61b5ca16732b5191f075425f2b6fc6f89f3f3c668721d",
+      "txid": "494a03e83ec5a01cc1cda06ed76669ea59727ce05d8c0c0d3a53f99694ed765e",
       "index": 2,
       "amount": 100000000,
       "state": {
         "amount": 200
       },
-      "address": "kaspatest:pqlpmm52n7qvkjuflxtylwpdsg642v2dnszkg4xhlp9p7nwkhmg4zp3pgzfya"
+      "address": "kaspatest:pq8yzupum5a2zrf87vgwl37flqzklndwaurgdd6vflhkvsryehuuj29a2gwz5"
     },
     "surplus": {
       "covid": "c76efdcbe2edfe162af0730ece57f739f57888b9e55993a021aaf34271297913",
-      "txid": "09c442de3524dc494e4d1e2a0ba1ea0b25a72da5d506b7aceab979e0b52b7fa1",
+      "txid": "d68f31d9dfb052eb5ce8eb0b2f640caead0ecef1a77e3af1b591fe1a96daf638",
       "index": 3,
-      "amount": 1160946950,
+      "amount": 4138728050,
       "state": {},
       "address": "kaspatest:pp8h4v37qr6wca57e2cq6muxkkcrg6ac28wp8vvudkkhk59d7l7lw2rnw8fy3"
     }
@@ -401,10 +401,136 @@
     },
     {
       "family": "stage1",
+      "step": "REPAY",
+      "txid": "986a249c9a97749e9e95fbe9b4003f58c2525c0acc2017a9b8dda5c0b049dce9",
+      "time": 1794762020,
+      "note": "Retiring the 175% vault before the liquidation line moved: repaid the $2.00 and withdrew all 300 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "CLOSE",
+      "txid": "6f818d5fefe23e8b90a205269c56b4d8e2e556a6b94f2fbeb277c127e1032b82",
+      "time": 1794762035,
+      "note": "Closed the empty vault and released its last 0.9 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "PSM-GENESIS",
+      "txid": "a6e8b867d6a58e0286ebec98baa6a87772f5ea2955fb976e4bed076ebf859981",
+      "time": 1794762428,
+      "note": "Liquidation line moved to 150% (borrowing still stops at 175%): the vault code changed, so a new peg stability module was created beside the same oracle and surplus pot."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-GENESIS",
+      "txid": "29ae3aa5850d4979323ce69af8c8d01750459853c5779da4c66551d7c6ab0a6d",
+      "time": 1794762440,
+      "note": "New issuance budget for the 150% deployment: at most $50,000 of new kUSD per day."
+    },
+    {
+      "family": "stage1",
+      "step": "AUTHORITY-GENESIS",
+      "txid": "b92ae1f8afaab9b7c1f873af42437849b8e3b1882c8053c704bee119164b68f4",
+      "time": 1794762444,
+      "note": "New kUSD token authority that knows the 150% vault: vaults now become liquidatable only below 150% of their debt, while borrowing still stops at 175%."
+    },
+    {
+      "family": "stage1",
+      "step": "WIRE",
+      "txid": "a79f216f994b6cd854f8a0d860e3879dd8cc6f28baa966df3f0b6b55b4a0f591",
+      "time": 1794762457,
+      "note": "New PSM wired to the new token authority."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-WIRE",
+      "txid": "bd880802d6591d17371afb177fa3d43cdb01e420fd82259ac7fdad86c2dfdf8c",
+      "time": 1794762464,
+      "note": "New issuance budget wired in."
+    },
+    {
+      "family": "stage1",
+      "step": "VAULT-GENESIS",
+      "txid": "59b6e1182441ca8f3c74146c2be9eac8f8226555695da4060f446df48c07bb57",
+      "time": 1794762478,
+      "note": "Collateral vault opened under the 150% liquidation line: 300 KAS locked."
+    },
+    {
+      "family": "stage1",
+      "step": "MINT",
+      "txid": "494a03e83ec5a01cc1cda06ed76669ea59727ce05d8c0c0d3a53f99694ed765e",
+      "time": 1794762489,
+      "note": "Minted $2.00 of kUSD from the new vault at $0.0270: 300 KAS, worth $8.10, is 405% of the debt (borrowing stops at 175%, liquidation below 150%). It used the same oracle box as before."
+    },
+    {
+      "family": "stage1",
+      "step": "SET_CEILING",
+      "txid": "2394a3dabaacf4c10218f7bcc999793dfceed4cf95e52023af51785e0587c330",
+      "time": 1794762501,
+      "note": "Governance (2 of 3) set the new PSM's ceiling to $50,000 and its fee to 0.50%, as before."
+    },
+    {
+      "family": "stage1",
+      "step": "VAULT-GENESIS",
+      "txid": "4ea6d7a899e175bcf9a93a295bdf29386c098a3e9c187516d3fced67d69fb266",
+      "time": 1794763038,
+      "note": "Liquidation rehearsal: a second vault opened with 20 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "ADJUST",
+      "txid": "e141b9130e879eec93da4e22e48d43b1b5332baf7fd323b57cbb4be1c67344e8",
+      "time": 1794763062,
+      "note": "Rehearsal vault topped up to 65.5 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "MINT",
+      "txid": "253dd5dc8ccb17531444b13665e16a8a7b47b1bc3385ee40bf78d870377ac7c6",
+      "time": 1794763073,
+      "note": "Rehearsal vault borrowed $1.00 at $0.0270: 65.5 KAS, worth $1.77, is 176% of the debt, just over the 175% borrowing line and 26 points above the liquidation line."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "6432b60ea8c1a4848a661c2478b64e9b36e7efa4f217f3b62a75c9b3f4556705",
+      "time": 1794763087,
+      "note": "Rehearsal price drop: operators 0, 1 and 2 printed 251. The mint price followed at once; the liquidation price may fall only 25% per hour, so it stopped at 260, leaving the vault at 170%."
+    },
+    {
+      "family": "stage1",
+      "step": "LIQ_REFUSED",
+      "txid": null,
+      "time": 1794763087,
+      "note": "Liquidation attempted with the vault at 170% at the liquidation price ($0.0260): refused by the covenant (never broadcast). Under the old shared 175% line this vault would already have been liquidatable."
+    },
+    {
+      "family": "stage1",
+      "step": "REFRESH",
+      "txid": "455952014487c4926a9544268dd4481522a8134c8222f12c40b72448b6e278fc",
+      "time": 1794765185,
+      "note": "Half an hour later operators 2, 3 and 4 printed 225 and the liquidation price reached it: the vault fell to 147%, under the 150% line."
+    },
+    {
+      "family": "stage1",
+      "step": "LIQUIDATE",
+      "txid": "e194c2c604971b047c7de95b71dc3986368ce439c25b18a680238f2416080856",
+      "time": 1794765199,
+      "note": "The price fell to $0.0225 and the vault sat at 147%, under the 150% line: liquidated in one transaction. The keeper burned the $1.00 debt and took 48.89 KAS (110%), the surplus pot took 1.33 KAS (3%), and 16.28 KAS stayed with the vault's owner."
+    },
+    {
+      "family": "stage1",
+      "step": "CLOSE",
+      "txid": "fbaa1a765445462c51f397c309d24c0b1727bb81ba619db7f160505612f6652e",
+      "time": 1794765213,
+      "note": "Closed the liquidated vault; the owner got its remaining 16.18 KAS back."
+    },
+    {
+      "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "547fd40bc86720bc373defcb76371e706a8eb51c4675fdd7c666da71b9be617e",
-      "time": 1794760753,
-      "note": "35 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 270 (CoinPaprika) / 269 (Kraken) / 270 (KuCoin), median $0.0270."
+      "txid": "022982f60d23157b1ed311661f425d9bffc3d4bbf7be2cd8b88bdcc925c98ed8",
+      "time": 1794767025,
+      "note": "38 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 270 (CoinPaprika) / 270 (Kraken) / 270 (KuCoin), median $0.0270."
     }
   ],
   "metering": [
