@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T05:39:05Z",
+  "generatedAt": "2026-11-15T06:09:08Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,41 +7,41 @@
   "covenants": {
     "oracle": {
       "covid": "dea6a1d33aae1335f57656845add90a22d7f179e695a97e183ce696be4e88314",
-      "txid": "1d01694f030ba05ae9d76f4f8648df882e77b322458b91a041337887b2ad4969",
+      "txid": "55d3971d019431b7fa8c22dd6a5ad9622604735120c39e223795cf7cd4d5a2c7",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 268,
-        "mint": 268,
-        "liq": 268,
-        "epoch": 17,
-        "last": 623849426,
+        "price": 266,
+        "mint": 266,
+        "liq": 266,
+        "epoch": 18,
+        "last": 623867383,
         "status": 0
       },
-      "address": "kaspatest:pqmrshrz0tt9eaku80nay8xulcsd288tvmrjpsqlqr7l2ghfvx27grhx0jshk"
+      "address": "kaspatest:pzyn23glmn0ha3yw0xtuqsd7zjg7tducr9uvun7qpl89rsyyd272xaxl9qfaw"
     },
     "budget": {
       "covid": "d483a76e2b8a2d24bc9c1d7781a84c7ffb2cde6bf553d840a5501710ddc9e316",
-      "txid": "43435a99a510daf39b8214101f074f4ff0740a2e79f81e84a9f99ab19b07cff4",
-      "index": 5,
+      "txid": "bb463e8113e444d8cf9bcbce95adecd62d8cf5c2ad55a85a964190c891ad49cf",
+      "index": 4,
       "amount": 100000000,
       "state": {
         "limit": 5000000,
-        "available": 4999900,
-        "last": 623843067
+        "available": 4999700,
+        "last": 623867176
       },
-      "address": "kaspatest:pq66hwr2w5e9rnfltcdwn7xzcctckdse8w9fn32zj4slldpyx44kxwtmhphsj"
+      "address": "kaspatest:ppx34fqp4pr0rl8ktw2c5e66yd3rejtd8vcttx2svxx3xsn4a0f0sz6g09j5t"
     },
     "psm": {
       "covid": "d7feb7c3d5e5d272ed1ba18d8a26125ba73ca5aa51b1f40bafc262612a6ce270",
-      "txid": "43435a99a510daf39b8214101f074f4ff0740a2e79f81e84a9f99ab19b07cff4",
+      "txid": "a9193cb283e17f13769899209afe27a5e20d8cc9be81f8dbf45c146d2099c46e",
       "index": 0,
-      "amount": 3831380000,
+      "amount": 52338880000,
       "state": {
-        "ceiling": 100000,
-        "minted": 100
+        "ceiling": 5000000,
+        "minted": 1400
       },
-      "address": "kaspatest:pr3xp5tz0gulquwzezgreg04wdlre3ju82hd98gq8hrdtjxwfnztcktsa2hjh"
+      "address": "kaspatest:pr2v5v7zxwra6j5fwzrqfqtwvdn0558f4rq4x95tv34lr2l56ewf6sxmxgeen"
     },
     "vault": {
       "covid": "a28396e1095d48946e296bc169b8c4b7d57bc65bef66b7c422a99ced23beec02",
@@ -56,13 +56,13 @@
     },
     "authority": {
       "covid": "1dc5238256f24fad172629127ea31cf75e917418ec7c9af798addd2426ce2fd0",
-      "txid": "43435a99a510daf39b8214101f074f4ff0740a2e79f81e84a9f99ab19b07cff4",
+      "txid": "57a03f757ec618b1cfa56658153c5a91304d23663cdbcf74630e12f364fb0e5b",
       "index": 1,
       "amount": 190000000,
       "state": {
-        "amount": 99999700
+        "amount": 99997700
       },
-      "address": "kaspatest:pzatku4nc4ap89e8fk4lrjyjaw7dm8ucykvyzf0qw0xg5n66ye6m2zn5w05ud"
+      "address": "kaspatest:pp82ycghc0vcsks3g5nkpmxas40nhywd04tt7xgv8dzqnywj7l382hys0l2qf"
     },
     "minted": {
       "covid": "1dc5238256f24fad172629127ea31cf75e917418ec7c9af798addd2426ce2fd0",
@@ -86,9 +86,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      0,
       2,
-      3
+      3,
+      4
     ],
     "rotated": [
       {
@@ -402,9 +402,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "1d01694f030ba05ae9d76f4f8648df882e77b322458b91a041337887b2ad4969",
-      "time": 1794721144,
-      "note": "13 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 3 printed 268 (CoinGecko) / 268 (Kraken) / 268 (KuCoin), median $0.0268."
+      "txid": "55d3971d019431b7fa8c22dd6a5ad9622604735120c39e223795cf7cd4d5a2c7",
+      "time": 1794722947,
+      "note": "14 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 266 (Kraken) / 266 (KuCoin) / 266 (Gate.io), median $0.0266."
     }
   ],
   "metering": [
