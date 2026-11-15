@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T00:37:18Z",
+  "generatedAt": "2026-11-15T00:57:51Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,18 +7,18 @@
   "covenants": {
     "oracle": {
       "covid": "dea6a1d33aae1335f57656845add90a22d7f179e695a97e183ce696be4e88314",
-      "txid": "3f146f22f8fe7ddeb918816d0f1ad1de35a85ed3687ff76d390c3f85b80dc611",
+      "txid": "db53b1c16de1708d2f1b089936698cebfbd7a87d175dba50bb4782941a80cfa2",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 262,
         "mint": 262,
         "liq": 262,
-        "epoch": 5,
-        "last": 623668218,
+        "epoch": 6,
+        "last": 623680655,
         "status": 0
       },
-      "address": "kaspatest:prfhqrx5j7qe3750ny6yyezm66xaz6mngnh67m94l5tuflx0zggdqvnx5kpnk"
+      "address": "kaspatest:pqcd5xj0sftkr0sewdayq9794xjf7dr38gq60vqazcnnuyqk2n6w6dy4dtc08"
     },
     "budget": {
       "covid": "d483a76e2b8a2d24bc9c1d7781a84c7ffb2cde6bf553d840a5501710ddc9e316",
@@ -86,9 +86,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      0,
       1,
-      2
+      3,
+      4
     ],
     "rotated": [
       {
@@ -274,6 +274,20 @@
       "note": "Minted $2.00 of kUSD again at the real price ($0.0258): 301 KAS of collateral, worth $7.77, is 388% of the debt (minimum 175%)."
     },
     {
+      "family": "stage1-v1",
+      "step": "REPAY",
+      "txid": "c1ddb2486f81632ac4ceba7e7b7de573512214a4a159a7d856c23087fa522916",
+      "time": 1794703171,
+      "note": "Retiring this deployment: repaid the $2.00 and withdrew all 301 KAS of collateral."
+    },
+    {
+      "family": "stage1-v1",
+      "step": "CLOSE",
+      "txid": "7e34215985db4952ac07d42c53fc4333a8d3303f810444a07a744a8e853241ab",
+      "time": 1794703182,
+      "note": "Closed the empty vault and released its last 0.9 KAS; this deployment is retired."
+    },
+    {
       "family": "stage1",
       "step": "ORACLE-GENESIS",
       "txid": "960df31a71462d2daca98f704fb85849aca452263e3456f26148bb47466d72e3",
@@ -374,9 +388,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "3f146f22f8fe7ddeb918816d0f1ad1de35a85ed3687ff76d390c3f85b80dc611",
-      "time": 1794703026,
-      "note": "1 routine refresh since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 262 / 262 / 262 (CoinGecko KAS/USD), median $0.0262."
+      "txid": "db53b1c16de1708d2f1b089936698cebfbd7a87d175dba50bb4782941a80cfa2",
+      "time": 1794704260,
+      "note": "2 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 3 and 4 printed 262 / 262 / 262 (CoinGecko unreachable, so they repeated the last price), median $0.0262."
     }
   ],
   "metering": [
