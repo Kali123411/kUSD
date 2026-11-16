@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T10:29:24Z",
+  "generatedAt": "2026-11-16T10:59:30Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "60d28f17b226f1a11f4ddf9736e00b4ac3766c933a7e078c0464e7e1e89e2b57",
+      "txid": "ab60d0c840ba951ee18d7a445864e79b675bd36974c765d2da44d3cbac59538b",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 264,
         "mint": 264,
         "liq": 264,
-        "epoch": 62,
-        "last": 624888830,
+        "epoch": 68,
+        "last": 624905856,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000019854,
-        "rem": 38050439
+        "index": 1000020933,
+        "rem": 291516096
       },
-      "address": "kaspatest:ppjpf3mw7jldzz5f7w67zfheeeatw7szvkjvhrqt3k2g5ttn3dxuq0yw7l0up"
+      "address": "kaspatest:ppma35kpagpx4j9hphuzdcxte4nnmdhz3htlrmwaezkhfdk8mp3x5jha6ceu6"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,9 +91,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      0,
-      1,
-      2
+      2,
+      3,
+      4
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "60d28f17b226f1a11f4ddf9736e00b4ac3766c933a7e078c0464e7e1e89e2b57",
-      "time": 1794824963,
-      "note": "198 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 264 (CoinGecko) / 264 (CoinPaprika) / 264 (Kraken), median $0.0264."
+      "txid": "ab60d0c840ba951ee18d7a445864e79b675bd36974c765d2da44d3cbac59538b",
+      "time": 1794826769,
+      "note": "204 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 264 (Kraken) / 264 (KuCoin) / 264 (Gate.io), median $0.0264."
     }
   ],
   "metering": [
