@@ -1,78 +1,83 @@
 {
-  "generatedAt": "2026-11-16T04:54:09Z",
+  "generatedAt": "2026-11-16T05:25:55Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
   "caveat": "kUSD is TN10 research software: not audited, not a product, not for real value.",
   "covenants": {
     "oracle": {
-      "covid": "dea6a1d33aae1335f57656845add90a22d7f179e695a97e183ce696be4e88314",
-      "txid": "3d08addd2a1174b5768ed0c51b2696d2b42d31eb8570ed0037a33ea9bdf0cc43",
+      "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
+      "txid": "0c5bc91152e6aa74727861286255a8a2d38edb0e6ccd699ab719f7c7dd641e99",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 268,
-        "mint": 268,
-        "liq": 268,
-        "epoch": 138,
-        "last": 624694844,
-        "status": 0
+        "price": 270,
+        "mint": 270,
+        "liq": 270,
+        "epoch": 2,
+        "last": 624713614,
+        "status": 0,
+        "rate": 200,
+        "next_rate": 200,
+        "index": 1000000221,
+        "rem": 85440000
       },
-      "address": "kaspatest:ppy5jknpqqkdfct02w8zlkmnf9gvgupx980s8hm4t2wl744kcllccnv08gdqq"
+      "address": "kaspatest:pqfz7tl6ywlk26w2rnnxxut73uv6h54nqxtqqmys4pz5v8s7rfswzgckrqvn5"
     },
     "budget": {
-      "covid": "1800cc9bd10c7c1839d978190e606c8b214dafd81546e60c876d2501e4076810",
-      "txid": "f578d0427180be0484abf94a24ac512a855c67c9bba09a1c0f6b3277439a78d0",
-      "index": 6,
+      "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
+      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
+      "index": 4,
       "amount": 100000000,
       "state": {
         "limit": 5000000,
-        "available": 51275,
-        "last": 624669487
+        "available": 4999600,
+        "last": 624712466
       },
-      "address": "kaspatest:pzedsys4p3kgcluptctk424m2290fqt92s33y2g7kq00ygwhjk6t5dr0tn7ut"
+      "address": "kaspatest:pqx3h9pzypad2p589vxcw8mwekrgtl9tmdfddfpdfm29epx4vrsg24f7qqgl5"
     },
     "psm": {
-      "covid": "4dd0036adb0ce9df7a5e169ed90d547d6f3a14d4b784f37ea7109f8d4af6bcc1",
-      "txid": "f578d0427180be0484abf94a24ac512a855c67c9bba09a1c0f6b3277439a78d0",
+      "covid": "3ef81a787bbe2f762b9fc983634c50fd77aa41c5c2f0cd6aa6e3790114a390f3",
+      "txid": "b0dc9087a605ec3dab89dbde1d7733d8eb97d267bc90f0dff98d4bdd3d84ec88",
       "index": 0,
-      "amount": 48607470000,
+      "amount": 100000000,
       "state": {
         "ceiling": 5000000,
-        "minted": 1300
+        "minted": 0
       },
-      "address": "kaspatest:pzxhmyjq4vw8a30ntuznqr9xg60zve7ps7jycqxcx68tmv4tmt0mgrzu0x05n"
+      "address": "kaspatest:pql67c362jxpxg3n2uyzn3a4hl4fvm96lfm87xwvhvdrh0tvzsc3xfnltvfl8"
     },
     "vault": {
-      "covid": "379ebb2ec97132aed34d5fc4c2a3d32df0fbc745d95baa192213bdb95bd1a023",
-      "txid": "9bfd045c97aaf3f0e32b0ab0595cb99f94bf280c82740f0afbae29243b964a1f",
+      "covid": "40e36e8ba4e7506a6367df719df267fe51a9557d71a2902ba74994bab8992d7d",
+      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
       "index": 0,
       "amount": 30100000000,
       "state": {
         "collateral": 30000000000,
-        "debt": 200
+        "debt_mc": 400000,
+        "index_at": 1000000000
       },
-      "address": "kaspatest:pz5t64y0r37z2jps8wjllszgcsv3v6zpfqwad49h0s4u2vj5n8ej24zl8yhu6"
+      "address": "kaspatest:pqm285c5jlcm56nca7uwxgjcrhqakmp032wavd92c77dvn7hxwkv7k908thmp"
     },
     "authority": {
-      "covid": "8459ecd833391f6dae3a17eb0539240329eca3346e5332159f713ccfe5dedd1a",
-      "txid": "f578d0427180be0484abf94a24ac512a855c67c9bba09a1c0f6b3277439a78d0",
+      "covid": "06b7532009b87f516475923a2b4dc6edb471b220391ca7c33c6fd88ff9f5ab32",
+      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
       "index": 1,
       "amount": 100000000,
       "state": {
-        "amount": 99998500
+        "amount": 99999600
       },
-      "address": "kaspatest:pqx69mw7eelka7nhcujz0q8x57mtdgxflq79h4tf49vlfmxpwka4j7slc0x84"
+      "address": "kaspatest:pqekkmgtsm28v7xf3jju73megs0q083q453vumg3p5ekymsckaqkg8008svsw"
     },
     "minted": {
-      "covid": "8459ecd833391f6dae3a17eb0539240329eca3346e5332159f713ccfe5dedd1a",
-      "txid": "9bfd045c97aaf3f0e32b0ab0595cb99f94bf280c82740f0afbae29243b964a1f",
+      "covid": "06b7532009b87f516475923a2b4dc6edb471b220391ca7c33c6fd88ff9f5ab32",
+      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
       "index": 2,
       "amount": 150000000,
       "state": {
-        "amount": 200
+        "amount": 400
       },
-      "address": "kaspatest:pq0en8e84vye5cyz04lf9u4xpu04n7xsudhkyn3umyy2gt6nfggecaxkpswpf"
+      "address": "kaspatest:pqgpg2fr7qs96thpfv8eqgh3pgvaaj38652m8a2vp2s9p79hkc8awle4yf40p"
     },
     "surplus": {
       "covid": "c76efdcbe2edfe162af0730ece57f739f57888b9e55993a021aaf34271297913",
@@ -87,8 +92,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      1,
-      2
+      2,
+      4
     ],
     "rotated": [
       {
@@ -618,10 +623,87 @@
     },
     {
       "family": "stage1",
+      "step": "REPAY",
+      "txid": "15184556036e0518e8c27acba9c5bac865ef273f05534398e14f325b93fe4c40",
+      "time": 1794806394,
+      "note": "Retiring the surge-fee deployment's vault before the stability fee: repaid the $2.00 and withdrew all 300 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "CLOSE",
+      "txid": "430dbef8fa7de1d64ae5b1075ecbd15869c98bf83973b07d75d799b4779ee360",
+      "time": 1794806402,
+      "note": "Closed the empty vault and released its last 0.9 KAS."
+    },
+    {
+      "family": "stage1",
+      "step": "ORACLE-GENESIS",
+      "txid": "5fca63e7642be9fec042f226e17134704e74db8034145a7fd0bbfb035530261d",
+      "time": 1794806416,
+      "note": "Oracle re-created with the stability-fee rate index: every refresh now also compounds a 2% a year interest index on its own signed clock, and governance can move the rate without a redeploy."
+    },
+    {
+      "family": "stage1",
+      "step": "PSM-GENESIS",
+      "txid": "29a27a29738501238c49bb5164292be35a5bddcb9256514689e8f90b16bf5f09",
+      "time": 1794806436,
+      "note": "Stability fee: kUSD debt now accrues interest at a governance-set annual rate (2% at launch), paid in kUSD. The oracle, vault and token code changed, so a new PSM was created beside the same surplus pot."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-GENESIS",
+      "txid": "7cbc6cfa003d62b66784c34b383b63d28074731bd86995f2a7b4f8833204db11",
+      "time": 1794806442,
+      "note": "New issuance budget for the stability-fee deployment: at most $50,000 of new kUSD per day."
+    },
+    {
+      "family": "stage1",
+      "step": "AUTHORITY-GENESIS",
+      "txid": "8607b0c2cae6c150dbba6447bb74e496632d8d635da1ae4989387fb34faa3d1e",
+      "time": 1794806448,
+      "note": "New kUSD token authority that knows the interest-bearing vault; the interest borrowers pay accumulates here as the protocol's revenue."
+    },
+    {
+      "family": "stage1",
+      "step": "WIRE",
+      "txid": "f5dd17273037fc28cc702ec5ffe5e3cd0fbdb7f2039d0d3a58e92ac791faf46a",
+      "time": 1794806454,
+      "note": "Stability-fee PSM wired to the new token authority."
+    },
+    {
+      "family": "stage1",
+      "step": "BUDGET-WIRE",
+      "txid": "237a599056972df7bf229a2ca41de89dfff01bb4215047b271a6af597bf97b70",
+      "time": 1794806461,
+      "note": "New issuance budget wired in."
+    },
+    {
+      "family": "stage1",
+      "step": "VAULT-GENESIS",
+      "txid": "0cdc0b4a1a32334c6b649510e0953483a3a2b2b61cbbf403a1d34b3107be32cf",
+      "time": 1794806467,
+      "note": "Collateral vault opened in the stability-fee deployment: 300 KAS locked; its debt will accrue interest."
+    },
+    {
+      "family": "stage1",
+      "step": "SET_CEILING",
+      "txid": "b0dc9087a605ec3dab89dbde1d7733d8eb97d267bc90f0dff98d4bdd3d84ec88",
+      "time": 1794806473,
+      "note": "Governance (2 of 3) set the stability-fee PSM's ceiling to $50,000 and its base fee to 0.50%."
+    },
+    {
+      "family": "stage1",
+      "step": "MINT",
+      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
+      "time": 1794806591,
+      "note": "Minted $4.00 of kUSD from the stability-fee deployment's vault at $0.0268: 300 KAS, worth $8.04, is 201% of the debt. From the next oracle refresh the debt accrues interest at 2% a year."
+    },
+    {
+      "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "3d08addd2a1174b5768ed0c51b2696d2b42d31eb8570ed0037a33ea9bdf0cc43",
-      "time": 1794804848,
-      "note": "132 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 268 (CoinGecko) / 268 (CoinPaprika) / 268 (Kraken), median $0.0268."
+      "txid": "0c5bc91152e6aa74727861286255a8a2d38edb0e6ccd699ab719f7c7dd641e99",
+      "time": 1794806754,
+      "note": "138 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 4 printed 270 (CoinGecko) / 270 (Kraken) / 270 (Gate.io), median $0.0270."
     }
   ],
   "metering": [
