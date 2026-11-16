@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T05:25:55Z",
+  "generatedAt": "2026-11-16T05:55:58Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,61 +7,61 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "0c5bc91152e6aa74727861286255a8a2d38edb0e6ccd699ab719f7c7dd641e99",
+      "txid": "2b20a8d4654e500d090c4c96f46abd2fd91cf786a06892690dec888aa65f4801",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 270,
-        "mint": 270,
-        "liq": 270,
-        "epoch": 2,
-        "last": 624713614,
+        "price": 269,
+        "mint": 269,
+        "liq": 269,
+        "epoch": 8,
+        "last": 624731797,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000000221,
-        "rem": 85440000
+        "index": 1000009895,
+        "rem": 1958570
       },
-      "address": "kaspatest:pqfz7tl6ywlk26w2rnnxxut73uv6h54nqxtqqmys4pz5v8s7rfswzgckrqvn5"
+      "address": "kaspatest:pzm9uuhtprft7gxfh4acnlsvx490gx83fvw7wuh3wmdzz8z8fwmqjur0g77gy"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
-      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
-      "index": 4,
+      "txid": "dd3a2cfc55a3b94e2d4d2537219a27bef4d880710f173582056a43568d408b92",
+      "index": 3,
       "amount": 100000000,
       "state": {
         "limit": 5000000,
-        "available": 4999600,
-        "last": 624712466
+        "available": 5000000,
+        "last": 624720537
       },
-      "address": "kaspatest:pqx3h9pzypad2p589vxcw8mwekrgtl9tmdfddfpdfm29epx4vrsg24f7qqgl5"
+      "address": "kaspatest:pppf9p2xjtak7lhmdcakevhzyrgz6vny23td4rsrn69g2zh6s28wzggmauqre"
     },
     "psm": {
       "covid": "3ef81a787bbe2f762b9fc983634c50fd77aa41c5c2f0cd6aa6e3790114a390f3",
-      "txid": "b0dc9087a605ec3dab89dbde1d7733d8eb97d267bc90f0dff98d4bdd3d84ec88",
+      "txid": "abebd18d80004b81d98c226e636cc28a89cec2fa2112de10002a34b1b9cb4af1",
       "index": 0,
-      "amount": 100000000,
+      "amount": 15007070000,
       "state": {
         "ceiling": 5000000,
-        "minted": 0
+        "minted": 401
       },
-      "address": "kaspatest:pql67c362jxpxg3n2uyzn3a4hl4fvm96lfm87xwvhvdrh0tvzsc3xfnltvfl8"
+      "address": "kaspatest:pztvg5968plpxvmj7xkey284kqveg4cefjf76vv5zpn632wttaaexm4su6tpp"
     },
     "vault": {
       "covid": "40e36e8ba4e7506a6367df719df267fe51a9557d71a2902ba74994bab8992d7d",
-      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
+      "txid": "dd3a2cfc55a3b94e2d4d2537219a27bef4d880710f173582056a43568d408b92",
       "index": 0,
       "amount": 30100000000,
       "state": {
         "collateral": 30000000000,
-        "debt_mc": 400000,
-        "index_at": 1000000000
+        "debt_mc": 0,
+        "index_at": 1000004561
       },
-      "address": "kaspatest:pqm285c5jlcm56nca7uwxgjcrhqakmp032wavd92c77dvn7hxwkv7k908thmp"
+      "address": "kaspatest:pzthwqv9tr8ytw27z2je6z9u4mqpehj4544f9qw0cmgs064e29fu7km3p787a"
     },
     "authority": {
       "covid": "06b7532009b87f516475923a2b4dc6edb471b220391ca7c33c6fd88ff9f5ab32",
-      "txid": "edcf071fb90b34ff866b2a47c0d41d02c2fec8ff8622c0e0db4ae99e387ed661",
+      "txid": "dd3a2cfc55a3b94e2d4d2537219a27bef4d880710f173582056a43568d408b92",
       "index": 1,
       "amount": 100000000,
       "state": {
@@ -81,9 +81,9 @@
     },
     "surplus": {
       "covid": "c76efdcbe2edfe162af0730ece57f739f57888b9e55993a021aaf34271297913",
-      "txid": "f578d0427180be0484abf94a24ac512a855c67c9bba09a1c0f6b3277439a78d0",
+      "txid": "abebd18d80004b81d98c226e636cc28a89cec2fa2112de10002a34b1b9cb4af1",
       "index": 3,
-      "amount": 5148983143,
+      "amount": 5223518493,
       "state": {},
       "address": "kaspatest:pp8h4v37qr6wca57e2cq6muxkkcrg6ac28wp8vvudkkhk59d7l7lw2rnw8fy3"
     }
@@ -92,8 +92,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      2,
-      4
+      1,
+      2
     ],
     "rotated": [
       {
@@ -700,10 +700,38 @@
     },
     {
       "family": "stage1",
+      "step": "SET_RATE",
+      "txid": "deb65247540f5626ed167271222f67673e69b88d5c48fb8b71254f1df74512ef",
+      "time": 1794806817,
+      "note": "Governance (2 of 3) armed a 50% a year stability fee. The next refresh still accrued its gap at 2% (+207 index units), then switched; the one after added +4,133 units in five minutes, 20x the step before."
+    },
+    {
+      "family": "stage1",
+      "step": "SWAP_IN",
+      "txid": "abebd18d80004b81d98c226e636cc28a89cec2fa2112de10002a34b1b9cb4af1",
+      "time": 1794807387,
+      "note": "Bought $4.01 of kUSD through the peg module: the $4.00 vault owed $4.01 after its first refresh, and a $4.00 box had just been refused for clearing it (\"clearing the vault takes at least 401 cents\")."
+    },
+    {
+      "family": "stage1",
+      "step": "REPAY",
+      "txid": "dd3a2cfc55a3b94e2d4d2537219a27bef4d880710f173582056a43568d408b92",
+      "time": 1794807400,
+      "note": "Repaid the $4.00 vault in full with the $4.01 box: $4.00 of principal and one cent of interest burned into the token authority, the collateral kept. The protocol's first cent of credit revenue."
+    },
+    {
+      "family": "stage1",
+      "step": "SET_RATE",
+      "txid": "02a58f516ab3fd90849c4e249daf3514e79663bb3ec7142c6b5ef8f248471b0f",
+      "time": 1794807446,
+      "note": "Governance (2 of 3) armed 2% a year again; the next refresh switched back."
+    },
+    {
+      "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "0c5bc91152e6aa74727861286255a8a2d38edb0e6ccd699ab719f7c7dd641e99",
-      "time": 1794806754,
-      "note": "138 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 4 printed 270 (CoinGecko) / 270 (Kraken) / 270 (Gate.io), median $0.0270."
+      "txid": "2b20a8d4654e500d090c4c96f46abd2fd91cf786a06892690dec888aa65f4801",
+      "time": 1794808557,
+      "note": "144 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 269 (CoinGecko) / 269 (CoinPaprika) / 269 (Kraken), median $0.0269."
     }
   ],
   "metering": [
