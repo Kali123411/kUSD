@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T09:59:25Z",
+  "generatedAt": "2026-11-16T10:29:24Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "b85de787642ea571cd3a9a4c113af06c099b3466f7d021d9e3591340be81409b",
+      "txid": "60d28f17b226f1a11f4ddf9736e00b4ac3766c933a7e078c0464e7e1e89e2b57",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 263,
-        "mint": 263,
-        "liq": 263,
-        "epoch": 56,
-        "last": 624878244,
+        "price": 264,
+        "mint": 264,
+        "liq": 264,
+        "epoch": 62,
+        "last": 624888830,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000019182,
-        "rem": 235855217
+        "index": 1000019854,
+        "rem": 38050439
       },
-      "address": "kaspatest:ppy2j39pwnmtxrvnhvla4n2ndrqsetpasad29f594x5ccfwq4m6avazxw4v7u"
+      "address": "kaspatest:ppjpf3mw7jldzz5f7w67zfheeeatw7szvkjvhrqt3k2g5ttn3dxuq0yw7l0up"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,9 +91,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      2,
-      3,
-      4
+      0,
+      1,
+      2
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "b85de787642ea571cd3a9a4c113af06c099b3466f7d021d9e3591340be81409b",
-      "time": 1794823164,
-      "note": "192 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 263 (Kraken) / 263 (KuCoin) / 263 (Gate.io), median $0.0263."
+      "txid": "60d28f17b226f1a11f4ddf9736e00b4ac3766c933a7e078c0464e7e1e89e2b57",
+      "time": 1794824963,
+      "note": "198 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 264 (CoinGecko) / 264 (CoinPaprika) / 264 (Kraken), median $0.0264."
     }
   ],
   "metering": [
