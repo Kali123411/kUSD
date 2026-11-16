@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T08:59:17Z",
+  "generatedAt": "2026-11-16T09:29:19Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "ae12c39bd195935bbaa95b7d902213364944c6e2a37d6c57939ca66f3476eeeb",
+      "txid": "8e73edba555c08af43b6c6981b8e71da6a5614f1eb74e0d28cb214041ce8903c",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 265,
         "mint": 265,
         "liq": 265,
-        "epoch": 44,
-        "last": 624844143,
+        "epoch": 50,
+        "last": 624863047,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000017020,
-        "rem": 11911773
+        "index": 1000018218,
+        "rem": 297243069
       },
-      "address": "kaspatest:pq4q3tj0jwp9kudj3wfquj3w9dnvq4ztlmex3t8jdl79hgpe3dqm786x4vjf9"
+      "address": "kaspatest:prqn4d22jsx2v7hlp578la9dkxcqm22ym0kw4nw2py0mtlhf7uf3zhdlw99du"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,9 +91,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      1,
       2,
-      3
+      3,
+      4
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "ae12c39bd195935bbaa95b7d902213364944c6e2a37d6c57939ca66f3476eeeb",
-      "time": 1794819556,
-      "note": "180 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 265 (CoinPaprika) / 265 (Kraken) / 265 (KuCoin), median $0.0265."
+      "txid": "8e73edba555c08af43b6c6981b8e71da6a5614f1eb74e0d28cb214041ce8903c",
+      "time": 1794821358,
+      "note": "186 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 265 (Kraken) / 265 (KuCoin) / 265 (Gate.io), median $0.0265."
     }
   ],
   "metering": [
