@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T12:29:34Z",
+  "generatedAt": "2026-11-16T12:59:37Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "7e6d6fcea979db57075b2837eb8eae8e7784dffc81da2b2c2001ee59b093c08b",
+      "txid": "4dfabf6d60e5e18f41abfeb97618db5414bca353f6d4583789df467b928a5317",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 262,
-        "mint": 262,
-        "liq": 262,
-        "epoch": 86,
-        "last": 624968185,
+        "price": 261,
+        "mint": 261,
+        "liq": 261,
+        "epoch": 92,
+        "last": 624986169,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000024886,
-        "rem": 281815262
+        "index": 1000026027,
+        "rem": 145167721
       },
-      "address": "kaspatest:pzegeqeg4tr9pg9wa5pyrve82wpwygp7c6dhvnnhtg4zxmx6t5hekz8t73nds"
+      "address": "kaspatest:pp8tx9phg3t5qftcqd8vgexjk5zr0r7ytegc6jvmmzm3923xwec82g5ppv5mv"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,7 +91,7 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      0,
+      1,
       2,
       3
     ],
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "7e6d6fcea979db57075b2837eb8eae8e7784dffc81da2b2c2001ee59b093c08b",
-      "time": 1794832173,
-      "note": "222 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 3 printed 262 (CoinGecko) / 262 (Kraken) / 262 (KuCoin), median $0.0262."
+      "txid": "4dfabf6d60e5e18f41abfeb97618db5414bca353f6d4583789df467b928a5317",
+      "time": 1794833976,
+      "note": "228 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 261 (CoinPaprika) / 261 (Kraken) / 261 (KuCoin), median $0.0261."
     }
   ],
   "metering": [
