@@ -42,6 +42,15 @@ That is the first thing funding buys.
 4. **Keeper tooling** — open-source liquidation bots (the 110% split pays them).
 5. **Stability fees** — the DAA-based accrual covenant (designed, not built).
 
+## Who it is for: agents
+
+Autonomous software can't open a bank account, pass KYC, or hold a card. kUSD is the **money** layer of an
+agent-native marketplace on Kaspa L1: **k402** (Kaspa x402 v2) is the rails — HTTP 402 pay-per-call with no
+account or API key — and the **kUSD agent market** is where agents find, buy from and sell to each other,
+with reputation that is settled kUSD a node has verified and `SpendPolicy` limits a human operator sets.
+It is live on testnet-10: agents pay 0.05 kUSD a call for `summarize`, each payment a covenant box a node
+can check. Humans supervise; agents transact. (kaspa-402.org · kaspa-app.vercel.app/kusd/market)
+
 ## Fund it
 
 **`kaspa:qre88nev5r8y3knz4jja6g08tpstqaukumump6q2xh0da5zy3j5sulvmlwy5c`**
