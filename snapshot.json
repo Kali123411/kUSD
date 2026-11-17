@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T12:34:24Z",
+  "generatedAt": "2026-11-17T13:04:25Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "38aaeed031f8d7f4aaf8a549e22edc64e0f85c8293352ab8b8bf85fbea1af971",
+      "txid": "ec2c0314f322e963460f80903fee4ca056030118b79c1cc298dc8e0ca279aaa1",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 273,
         "mint": 273,
         "liq": 273,
-        "epoch": 374,
-        "last": 625828593,
+        "epoch": 380,
+        "last": 625845963,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000079456,
-        "rem": 142293998
+        "index": 1000080558,
+        "rem": 43329440
       },
-      "address": "kaspatest:pqwem9hmjt80jf6qc9rc8cy7j37e58qzs3chrd9x4zw4a8e9seg7zddewvu7m"
+      "address": "kaspatest:ppmws7e5wne33ulqgpjz0ga9gk74c0ze93fsk8f9q7nxfcc5vy2pcgltv5ncv"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "38aaeed031f8d7f4aaf8a549e22edc64e0f85c8293352ab8b8bf85fbea1af971",
-      "time": 1794918863,
-      "note": "510 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 273 (CoinGecko) / 273 (CoinPaprika) / 273 (Kraken), median $0.0273."
+      "txid": "ec2c0314f322e963460f80903fee4ca056030118b79c1cc298dc8e0ca279aaa1",
+      "time": 1794920664,
+      "note": "516 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 273 (CoinGecko) / 273 (CoinPaprika) / 273 (Kraken), median $0.0273."
     }
   ],
   "metering": [
