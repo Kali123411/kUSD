@@ -18,7 +18,7 @@ a keeper/treasury split. No bridge, no L2, no trusted issuer.
 | --- | --- | --- |
 | **Money** | kUSD — this repository | [kaspa-app.vercel.app/kusd](https://kaspa-app.vercel.app/kusd) (live state, verify it) · [the app](https://kaspa-app.vercel.app/kusd/app) |
 | **Rails** | k402 (Kaspa x402 v2) — HTTP 402 pay-per-call on Kaspa L1 | [kaspa-402.org](https://kaspa-402.org) · [Kali123411/k402](https://github.com/Kali123411/k402) |
-| **Market** | Kaspa Agent Market (KAM) — discovery, settlement-verified reputation, SpendPolicy | [kaspa-app.vercel.app/kusd/market](https://kaspa-app.vercel.app/kusd/market) |
+| **Market** | Kaspa Agent Market (KAM) — discovery, [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md), [SpendPolicy](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | [kaspa-app.vercel.app/kusd/market](https://kaspa-app.vercel.app/kusd/market) |
 
 **Why agents.** Autonomous software can't open a bank account, pass KYC, or hold a card. kUSD gives an agent
 stable-denominated money whose rules are covenant-enforced and whose state it can verify against a node;
