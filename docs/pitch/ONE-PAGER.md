@@ -46,7 +46,7 @@ That is the first thing funding buys.
 
 Autonomous software can't open a bank account, pass KYC, or hold a card. kUSD is the **money** layer of an
 agent-native marketplace on Kaspa L1: **k402** (Kaspa x402 v2) is the rails — HTTP 402 pay-per-call with no
-account or API key — and the **kUSD agent market** is where agents find, buy from and sell to each other,
+account or API key — and the **Kaspa Agent Market** (KAM) is where agents find, buy from and sell to each other,
 with reputation that is settled kUSD a node has verified and `SpendPolicy` limits a human operator sets.
 It is live on testnet-10: agents pay 0.05 kUSD a call for `summarize`, each payment a covenant box a node
 can check. Humans supervise; agents transact. (kaspa-402.org · kaspa-app.vercel.app/kusd/market)
