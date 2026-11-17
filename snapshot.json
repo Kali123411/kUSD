@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T16:34:47Z",
+  "generatedAt": "2026-11-17T17:04:47Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "86593d64ecf2489f058c719d7f7d4d0c0ce2e65330b20b5795cb1391a57b092a",
+      "txid": "7ee216c1312fd5342780cd5531fdee50101c6dcbf00526a158535411baf32c72",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 269,
-        "mint": 269,
-        "liq": 269,
-        "epoch": 422,
-        "last": 625972956,
+        "price": 268,
+        "mint": 268,
+        "liq": 268,
+        "epoch": 428,
+        "last": 625990797,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000088612,
-        "rem": 208412171
+        "index": 1000089744,
+        "rem": 72670295
       },
-      "address": "kaspatest:pr5r57ewhfhww09p8dy03vvlv8p78dqz7038e60f8dhsh38xd27js7jygrguu"
+      "address": "kaspatest:pqyp4rc3ys92zts2vsux0zvyut3agdgwahjykueekfxzm9kasfrj7px0ehkr0"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -92,8 +92,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      2,
-      4
+      1,
+      3
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "86593d64ecf2489f058c719d7f7d4d0c0ce2e65330b20b5795cb1391a57b092a",
-      "time": 1794933285,
-      "note": "558 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 4 printed 269 (CoinGecko) / 269 (Kraken) / 269 (Gate.io), median $0.0269."
+      "txid": "7ee216c1312fd5342780cd5531fdee50101c6dcbf00526a158535411baf32c72",
+      "time": 1794935085,
+      "note": "564 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 3 printed 268 (CoinGecko) / 268 (CoinPaprika) / 268 (KuCoin), median $0.0268."
     }
   ],
   "metering": [
