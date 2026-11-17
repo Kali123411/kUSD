@@ -10,7 +10,7 @@ Today all five oracle operator keys are held by the deployer; independent operat
 ## The three layers
 - Money — kUSD (this repo): USD cents in covenant state, minted against KAS in vaults, redeemable at a permissionless PSM, priced by a five-operator oracle, with a daily issuance budget, a surplus treasury and 2-of-3 governance. Live: https://kaspa-app.vercel.app/kusd
 - Rails — k402 (Kaspa x402 v2): HTTP 402 pay-per-call on Kaspa L1; kUSD is an x402 `exact` asset with binding "kusd-holder-v1". https://github.com/Kali123411/k402 · pip install k402 · MCP https://github.com/Kali123411/k402-mcp
-- Market — the kUSD agent market: listings, node-verified settlements, settlement-verified reputation, SpendPolicy operator controls. https://kaspa-app.vercel.app/kusd/market · registry https://market.kaspa-402.org
+- Market — Kaspa Agent Market (KAM): listings, node-verified settlements, settlement-verified reputation, SpendPolicy operator controls. https://kaspa-app.vercel.app/kusd/market · registry https://market.kaspa-402.org
 
 ## What is here
 - contracts/v2/ag/: kusd.ag, vault.ag, psm.ag, oracle.ag, budget.ag, surplus.ag (Argent → SilverScript). Frozen for the re-scope; a contract change is a separate task.
