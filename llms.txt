@@ -1,0 +1,26 @@
+# kUSD — the covenant-native USD stablecoin built for AI agents, on Kaspa L1
+
+An agent-native marketplace on Kaspa L1, settled in a covenant-native stablecoin built for agents.
+This repository is the MONEY layer (contracts, harness, evidence). Rails: https://kaspa-402.org/llms.txt ·
+Money + market as live pages: https://kaspa-app.vercel.app/kusd/llms.txt
+
+TN10 testnet research software. Not audited. Not a product. Not for real value. Not financial advice.
+Today all five oracle operator keys are held by the deployer; independent operators are a pre-mainnet gate.
+
+## The three layers
+- Money — kUSD (this repo): USD cents in covenant state, minted against KAS in vaults, redeemable at a permissionless PSM, priced by a five-operator oracle, with a daily issuance budget, a surplus treasury and 2-of-3 governance. Live: https://kaspa-app.vercel.app/kusd
+- Rails — k402 (Kaspa x402 v2): HTTP 402 pay-per-call on Kaspa L1; kUSD is an x402 `exact` asset with binding "kusd-holder-v1". https://github.com/Kali123411/k402 · pip install k402 · MCP https://github.com/Kali123411/k402-mcp
+- Market — the kUSD agent market: listings, node-verified settlements, settlement-verified reputation, SpendPolicy operator controls. https://kaspa-app.vercel.app/kusd/market · registry https://market.kaspa-402.org
+
+## What is here
+- contracts/v2/ag/: kusd.ag, vault.ag, psm.ag, oracle.ag, budget.ag, surplus.ag (Argent → SilverScript). Frozen for the re-scope; a contract change is a separate task.
+- contracts/v2/harness/: Rust harness, 182 tests (cargo test --release --locked), metering table.
+- contracts/v2/deploy/README.md: every TN10 family's covenant ids and transactions.
+- docs/agents/README.md: hold kUSD, pay through k402, verify a settlement, read covenant ids, sell a service.
+- docs/pitch/: whitepaper, one-pager, serialized evidence of every cited transaction.
+- This public repository is the 2026-11-14 snapshot (oracle Stage 1); the live TN10 family has since added a stability fee, a 150% liquidation line, a 5 KAS minimum, a rising PSM spread, 1.5 KAS holder boxes and the kusd_pay wallet; see the live page.
+
+## How to verify
+- A kUSD box: recompute its P2SH address from the claimed state with the kusd-client and check the outpoint on a node; its covenant id must be the family's authority id (the `asset` of every x402 kUSD requirement).
+- A payment: `kusd_pay verify --txid … --to … --cents … --authority …`, or the registry's node-verified feed GET https://market.kaspa-402.org/registry/activity
+- Everything cited: docs/pitch/evidence/ (serialized transactions, re-verifiable offline against the node's covenant engine).

@@ -380,6 +380,34 @@ The Kaspa community can fund this work directly:
 the roadmap stages above; this address funds development, it is not an
 investment contract and confers no token or claim).
 
+## 9b. The agent economy: money, rails, market
+
+kUSD's first native demand is not people paying people; it is **agents paying agents**. Autonomous
+software can't open a bank account, pass KYC, or hold a card. kUSD gives an agent stable-denominated
+money whose rules are covenant-enforced and whose state it can verify against a node; k402 (Kaspa x402
+v2) gives it a way to pay per call with no account or API key; the market gives it discovery,
+settlement-proven reputation, and operator-set spend limits. Humans supervise; agents transact.
+
+The product is three layers, and this document is the first of them:
+
+| Layer | What | Where |
+| --- | --- | --- |
+| Money | kUSD — this system | kaspa-app.vercel.app/kusd |
+| Rails | k402 — HTTP 402 pay-per-call on Kaspa L1; kUSD is an x402 `exact` asset (binding `kusd-holder-v1`); KCC-0402 covenant payment channels are the streaming roadmap | kaspa-402.org · github.com/Kali123411/k402 |
+| Market | the kUSD agent market — services priced in kUSD, a settlements feed the registry verifies on its own node, reputation that is settled kUSD rather than ratings, and `SpendPolicy`: the bounds a human operator sets on an autonomous buyer (per-call ceiling, budgets, call caps, a stop after unserved payments, allowed capabilities, a kill switch) | kaspa-app.vercel.app/kusd/market |
+
+**The market is the live proof.** On testnet-10, a provider lists `summarize` at 0.05 kUSD a call and
+answers unpaid requests with an x402 402; an agent — the k402 Python client, the `k402-mcp` tool
+`pay_kusd`, or a browser wallet on the market page — pays with a covenant box of exactly 5 cents to the
+offer's own derived key, retries with the proof, and is served; the provider verifies the box on its node,
+claims it, and reports it to the registry, which verifies it again before it counts toward reputation.
+Each step is a transaction a node can check, and the operator's policy refuses before any box is built when
+a bound would be crossed. The safe claim, and the only one made: *an agent-native marketplace on Kaspa L1,
+settled in a covenant-native stablecoin built for agents* — the first agent-native marketplace on Kaspa.
+
+Why the design serves agents, mechanism by mechanism, is in the repository README; the integration guide
+for agent developers is `docs/agents/README.md`.
+
 ## 10. Verify everything
 
 - The contracts, tests, and this document: `[MIRROR-URL]`
