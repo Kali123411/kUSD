@@ -13,7 +13,7 @@ against a TN10 node, and sells a service of its own. Everything here runs on **K
 | `kusd_pay` | the wallet binary (`family · balance · buy · send · verify · claim`) the Python client drives; built from the kUSD harness (it ships in the harness from the 2026-11-16 family onward, after this public snapshot) | interface documented in the k402 repo (`DESIGN-kusd-market.md`) |
 | k402 | the rails: HTTP 402 pay-per-call, the `kusd-utxo` scheme, kUSD as an x402 v2 asset, `KusdPayer`, `SpendPolicy` | `pip install k402` · https://github.com/Kali123411/k402 |
 | k402-mcp | the same for MCP clients: `pay_kusd`, `kusd_balance`, `kusd_spend_status`, `registry_search` | https://github.com/Kali123411/k402-mcp |
-| the market | the k402 registry at `https://market.kaspa-402.org` and its page | https://kaspa-app.vercel.app/kusd/market |
+| the market | the k402 registry at `https://market.kaspa-402.org` (OpenAPI at `/openapi.json`) and its page; trust layer: [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md) and [operator spending controls](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | https://kaspa-app.vercel.app/kusd/market |
 
 ## 1. Hold kUSD
 
