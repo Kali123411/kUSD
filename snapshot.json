@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T09:04:07Z",
+  "generatedAt": "2026-11-17T09:34:07Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "2942c1da594a31d1801df91a1e61340f4748e0bd523c6e093c1cabf0b88ff090",
+      "txid": "92ad6071e29d43302b6ecc5bacb7bcff73bc40c64140de8f0a201f18e3f6c9d8",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 268,
-        "mint": 268,
-        "liq": 268,
-        "epoch": 332,
-        "last": 625711323,
+        "price": 267,
+        "mint": 267,
+        "liq": 267,
+        "epoch": 338,
+        "last": 625729137,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000072018,
-        "rem": 212605759
+        "index": 1000073148,
+        "rem": 161619659
       },
-      "address": "kaspatest:pqej27agv2cw735vq5s9af4t2kv3xf07c7rtw728x4j9mmvvr027wsetc7m2c"
+      "address": "kaspatest:pr0dmav5c6mq3gd2m5g3e4wgdcpaywzu3t9rzwah53xpg9n5gkwkvejtrqzdc"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,8 +91,8 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
+      1,
       2,
-      3,
       4
     ],
     "rotated": [
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "2942c1da594a31d1801df91a1e61340f4748e0bd523c6e093c1cabf0b88ff090",
-      "time": 1794906246,
-      "note": "468 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 268 (Kraken) / 268 (KuCoin) / 268 (Gate.io), median $0.0268."
+      "txid": "92ad6071e29d43302b6ecc5bacb7bcff73bc40c64140de8f0a201f18e3f6c9d8",
+      "time": 1794908046,
+      "note": "474 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 4 printed 267 (CoinPaprika) / 267 (Kraken) / 267 (Gate.io), median $0.0267."
     }
   ],
   "metering": [
