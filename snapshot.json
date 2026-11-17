@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T22:35:15Z",
+  "generatedAt": "2026-11-17T23:05:13Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "6f03c1536cf7abbf9eca2613c5f5373703dc6b485426c0b4a49a5987a315b5ea",
+      "txid": "a720a869ebc19f1ed9c4685bac58e6479168c4cad528bb8d80e9e27b9afb4e9e",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 273,
         "mint": 273,
         "liq": 273,
-        "epoch": 494,
-        "last": 626186990,
+        "epoch": 500,
+        "last": 626206497,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000102187,
-        "rem": 284272966
+        "index": 1000103425,
+        "rem": 48651527
       },
-      "address": "kaspatest:ppngav88t4s5stcn0sv80ypt7znxpjzvayy6ge0tznnkmgxn5t6627x7w4v7u"
+      "address": "kaspatest:prsm8yg9sprqy6p9yhvue4eqsn5w320pqed9zt0lv6tenr7qt977cr78p3qar"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -92,8 +92,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      2,
-      4
+      1,
+      2
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "6f03c1536cf7abbf9eca2613c5f5373703dc6b485426c0b4a49a5987a315b5ea",
-      "time": 1794954913,
-      "note": "630 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 4 printed 273 (CoinGecko) / 273 (Kraken) / 273 (Gate.io), median $0.0273."
+      "txid": "a720a869ebc19f1ed9c4685bac58e6479168c4cad528bb8d80e9e27b9afb4e9e",
+      "time": 1794956712,
+      "note": "636 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 273 (CoinGecko) / 273 (CoinPaprika) / 273 (Kraken), median $0.0273."
     }
   ],
   "metering": [
