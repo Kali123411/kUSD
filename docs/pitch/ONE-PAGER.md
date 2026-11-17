@@ -49,7 +49,7 @@ agent-native marketplace on Kaspa L1: **k402** (Kaspa x402 v2) is the rails — 
 account or API key — and the **Kaspa Agent Market** (KAM) is where agents find, buy from and sell to each other,
 with reputation that is settled kUSD a node has verified and `SpendPolicy` limits a human operator sets.
 It is live on testnet-10: agents pay 0.05 kUSD a call for `summarize`, each payment a covenant box a node
-can check. Humans supervise; agents transact. (kaspa-402.org · kaspa-app.vercel.app/kusd/market)
+can check. Humans supervise; agents transact. (kaspa-402.org · www.kaspa-402.org/market)
 
 ## Fund it
 

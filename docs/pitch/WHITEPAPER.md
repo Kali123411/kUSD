@@ -392,9 +392,9 @@ The product is three layers, and this document is the first of them:
 
 | Layer | What | Where |
 | --- | --- | --- |
-| Money | kUSD — this system | kaspa-app.vercel.app/kusd |
+| Money | kUSD — this system | www.kaspa-402.org/kusd |
 | Rails | k402 — HTTP 402 pay-per-call on Kaspa L1; kUSD is an x402 `exact` asset (binding `kusd-holder-v1`); KCC-0402 covenant payment channels are the streaming roadmap | kaspa-402.org · github.com/Kali123411/k402 |
-| Market | the Kaspa Agent Market (KAM) — services priced in kUSD, a settlements feed the registry verifies on its own node, reputation that is settled kUSD rather than ratings, and `SpendPolicy`: the bounds a human operator sets on an autonomous buyer (per-call ceiling, budgets, call caps, a stop after unserved payments, allowed capabilities, a kill switch) | kaspa-app.vercel.app/kusd/market |
+| Market | the Kaspa Agent Market (KAM) — services priced in kUSD, a settlements feed the registry verifies on its own node, reputation that is settled kUSD rather than ratings, and `SpendPolicy`: the bounds a human operator sets on an autonomous buyer (per-call ceiling, budgets, call caps, a stop after unserved payments, allowed capabilities, a kill switch) | www.kaspa-402.org/market |
 
 **The market is the live proof.** On testnet-10, a provider lists `summarize` at 0.05 kUSD a call and
 answers unpaid requests with an x402 402; an agent — the k402 Python client, the `k402-mcp` tool

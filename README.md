@@ -16,9 +16,9 @@ a keeper/treasury split. No bridge, no L2, no trusted issuer.
 
 | Layer | What | Where |
 | --- | --- | --- |
-| **Money** | kUSD — this repository | [kaspa-app.vercel.app/kusd](https://kaspa-app.vercel.app/kusd) (live state, verify it) · [the app](https://kaspa-app.vercel.app/kusd/app) |
+| **Money** | kUSD — this repository | [www.kaspa-402.org/kusd](https://www.kaspa-402.org/kusd) (live state, verify it) · [the app](https://www.kaspa-402.org/kusd/app) |
 | **Rails** | k402 (Kaspa x402 v2) — HTTP 402 pay-per-call on Kaspa L1 | [kaspa-402.org](https://kaspa-402.org) · [Kali123411/k402](https://github.com/Kali123411/k402) |
-| **Market** | Kaspa Agent Market (KAM) — discovery, [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md), [SpendPolicy](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | [kaspa-app.vercel.app/kusd/market](https://kaspa-app.vercel.app/kusd/market) |
+| **Market** | Kaspa Agent Market (KAM) — discovery, [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md), [SpendPolicy](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | [www.kaspa-402.org/market](https://www.kaspa-402.org/market) |
 
 **Why agents.** Autonomous software can't open a bank account, pass KYC, or hold a card. kUSD gives an agent
 stable-denominated money whose rules are covenant-enforced and whose state it can verify against a node;
@@ -42,7 +42,7 @@ Start here:
 ## What this snapshot is
 
 This public repository is the **2026-11-14 snapshot (oracle Stage 1 family)** of the kUSD contracts, harness
-and evidence. The live TN10 deployment shown at [kaspa-app.vercel.app/kusd](https://kaspa-app.vercel.app/kusd)
+and evidence. The live TN10 deployment shown at [www.kaspa-402.org/kusd](https://www.kaspa-402.org/kusd)
 has since added a 2 %/year stability fee on vault debt, a 150 % liquidation line (borrowing stays at 175 %),
 a 5 KAS minimum collateral, a rising PSM swap-in spread, 1.5 KAS holder boxes and the `kusd_pay` wallet
 binary that the k402 market uses; the live page and its deploy records are the reference for those, and

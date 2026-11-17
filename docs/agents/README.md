@@ -9,18 +9,18 @@ against a TN10 node, and sells a service of its own. Everything here runs on **K
 
 | Piece | What it is | Where |
 | --- | --- | --- |
-| kUSD | USD cents held as covenant state in boxes owned by an x-only key | this repo; live state at https://kaspa-app.vercel.app/kusd |
+| kUSD | USD cents held as covenant state in boxes owned by an x-only key | this repo; live state at https://www.kaspa-402.org/kusd |
 | `kusd_pay` | the wallet binary (`family · balance · buy · send · verify · claim`) the Python client drives; built from the kUSD harness (it ships in the harness from the 2026-11-16 family onward, after this public snapshot) | interface documented in the k402 repo (`DESIGN-kusd-market.md`) |
 | k402 | the rails: HTTP 402 pay-per-call, the `kusd-utxo` scheme, kUSD as an x402 v2 asset, `KusdPayer`, `SpendPolicy` | `pip install k402` · https://github.com/Kali123411/k402 |
 | k402-mcp | the same for MCP clients: `pay_kusd`, `kusd_balance`, `kusd_spend_status`, `registry_search` | https://github.com/Kali123411/k402-mcp |
-| the market | the k402 registry at `https://market.kaspa-402.org` (OpenAPI at `/openapi.json`) and its page; trust layer: [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md) and [operator spending controls](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | https://kaspa-app.vercel.app/kusd/market |
+| the market | the k402 registry at `https://market.kaspa-402.org` (OpenAPI at `/openapi.json`) and its page; trust layer: [settlement-verified reputation](https://github.com/Kali123411/k402/blob/main/docs/reputation.md) and [operator spending controls](https://github.com/Kali123411/k402/blob/main/docs/spend-policy.md) | https://www.kaspa-402.org/market |
 
 ## 1. Hold kUSD
 
 A kUSD box is owned by a secp256k1 x-only key; the same key is a Kaspa address for the KAS that pays fees and
 sits in each box (1.5 KAS per holder box on the current family). Two ways to get a funded key on testnet-10:
 
-- **Browser:** https://kaspa-app.vercel.app/kusd/app creates a sealed keystore, takes TKAS from the faucet,
+- **Browser:** https://www.kaspa-402.org/kusd/app creates a sealed keystore, takes TKAS from the faucet,
   buys kUSD from the PSM and sends it. The same key is an agent on the market page.
 - **Code:** generate a 32-byte secret, fund its `kaspatest:` address with TKAS (https://faucet-tn10.kaspanet.io/),
   then buy kUSD through the PSM:
@@ -90,7 +90,7 @@ A kUSD payment is not a receipt: it is a covenant output a node can check.
 
 The deploy runbook ([contracts/v2/deploy/README.md](../../contracts/v2/deploy/README.md)) lists every family's
 covenant ids and the transactions that created them; the live page publishes the current family's ids in
-https://kaspa-app.vercel.app/kusd/snapshot.json (`covenants.<name>.covid`). The **authority** id is the token's
+https://www.kaspa-402.org/kusd/snapshot.json (`covenants.<name>.covid`). The **authority** id is the token's
 on-chain identity: it is the `asset` of every kUSD x402 requirement and the `KUSD_AUTHORITY` the wallet pins, so
 a relay or a provider can never substitute another family's boxes. Covenant state is a script hash: to check a
 published value, compile the template with that state and compare the hash with the output on chain.
