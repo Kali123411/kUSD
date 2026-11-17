@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T20:05:03Z",
+  "generatedAt": "2026-11-17T20:35:05Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "7278a6bb2d62eac75ca19422f57839ef591e57788ddcf1d9f555470d126f6e7c",
+      "txid": "ef420778c5a2b3c25c783cb5a360d1065da8a937dd72f9a93e16e2f5f141fa6c",
       "index": 0,
       "amount": 100000000,
       "state": {
-        "price": 270,
-        "mint": 270,
-        "liq": 270,
-        "epoch": 464,
-        "last": 626099164,
+        "price": 271,
+        "mint": 271,
+        "liq": 271,
+        "epoch": 470,
+        "last": 626116701,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000096617,
-        "rem": 145082422
+        "index": 1000097729,
+        "rem": 238801456
       },
-      "address": "kaspatest:ppg4dd37nj77rc967g68zqk7r2wzkzwvwnakpzma28eq5auhrw92ujucfuql8"
+      "address": "kaspatest:ppfqgsvytyysfefzszsqm9928p832qr8kkxg6x9dgpzxjmm3k37v5ylyz5kw6"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,9 +91,9 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
+      0,
       1,
-      2,
-      3
+      2
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "7278a6bb2d62eac75ca19422f57839ef591e57788ddcf1d9f555470d126f6e7c",
-      "time": 1794945899,
-      "note": "600 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 270 (CoinPaprika) / 270 (Kraken) / 270 (KuCoin), median $0.0270."
+      "txid": "ef420778c5a2b3c25c783cb5a360d1065da8a937dd72f9a93e16e2f5f141fa6c",
+      "time": 1794947704,
+      "note": "606 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 271 (CoinGecko) / 270 (CoinPaprika) / 271 (Kraken), median $0.0271."
     }
   ],
   "metering": [
