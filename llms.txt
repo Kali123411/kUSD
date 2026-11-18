@@ -2,15 +2,15 @@
 
 An agent-native marketplace on Kaspa L1, settled in a covenant-native stablecoin built for agents.
 This repository is the MONEY layer (contracts, harness, evidence). Rails: https://kaspa-402.org/llms.txt ·
-Money + market as live pages: https://kaspa-app.vercel.app/kusd/llms.txt
+Money + market as live pages: https://www.kaspa-402.org/kusd/llms.txt
 
 TN10 testnet research software. Not audited. Not a product. Not for real value. Not financial advice.
 Today all five oracle operator keys are held by the deployer; independent operators are a pre-mainnet gate.
 
 ## The three layers
-- Money — kUSD (this repo): USD cents in covenant state, minted against KAS in vaults, redeemable at a permissionless PSM, priced by a five-operator oracle, with a daily issuance budget, a surplus treasury and 2-of-3 governance. Live: https://kaspa-app.vercel.app/kusd
+- Money — kUSD (this repo): USD cents in covenant state, minted against KAS in vaults, redeemable at a permissionless PSM, priced by a five-operator oracle, with a daily issuance budget, a surplus treasury and 2-of-3 governance. Live: https://www.kaspa-402.org/kusd
 - Rails — k402 (Kaspa x402 v2): HTTP 402 pay-per-call on Kaspa L1; kUSD is an x402 `exact` asset with binding "kusd-holder-v1". https://github.com/Kali123411/k402 · pip install k402 · MCP https://github.com/Kali123411/k402-mcp
-- Market — Kaspa Agent Market (KAM): listings, node-verified settlements, settlement-verified reputation, SpendPolicy operator controls. https://kaspa-app.vercel.app/kusd/market · registry https://market.kaspa-402.org
+- Market — Kaspa Agent Market (KAM): listings, node-verified settlements, settlement-verified reputation, SpendPolicy operator controls. https://www.kaspa-402.org/market · registry https://market.kaspa-402.org
 
 ## What is here
 - contracts/v2/ag/: kusd.ag, vault.ag, psm.ag, oracle.ag, budget.ag, surplus.ag (Argent → SilverScript). Frozen for the re-scope; a contract change is a separate task.
