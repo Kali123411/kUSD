@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T01:05:23Z",
+  "generatedAt": "2026-11-18T01:35:28Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "5e43fc891dc9bd85611d61e9359acaf04fd007cce862174931baeaa36417e8ce",
+      "txid": "d67aed00c74db5948d95dacd8e79f701939a34cfe85343f19d5ef0b4bc49d2a4",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 274,
         "mint": 274,
         "liq": 274,
-        "epoch": 524,
-        "last": 626278291,
+        "epoch": 530,
+        "last": 626296599,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000107978,
-        "rem": 246171036
+        "index": 1000109139,
+        "rem": 312912809
       },
-      "address": "kaspatest:pq66mqq6zgzmgpv6a6sk6c5npm25s9kywudpk5chhsj05d6hjzgf6cznqj4wp"
+      "address": "kaspatest:pzrstwuf3hf9ujtfd3qxs48yk97enrn4vmv25pfmw7kh2kn46pzy5gmnacm25"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -91,7 +91,7 @@
   "operators": {
     "slots": 5,
     "lastRefreshSigners": [
-      0,
+      1,
       2,
       3
     ],
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "5e43fc891dc9bd85611d61e9359acaf04fd007cce862174931baeaa36417e8ce",
-      "time": 1794963922,
-      "note": "660 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 3 printed 274 (CoinGecko) / 274 (Kraken) / 274 (KuCoin), median $0.0274."
+      "txid": "d67aed00c74db5948d95dacd8e79f701939a34cfe85343f19d5ef0b4bc49d2a4",
+      "time": 1794965727,
+      "note": "666 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 1, 2 and 3 printed 274 (CoinPaprika) / 274 (Kraken) / 274 (KuCoin), median $0.0274."
     }
   ],
   "metering": [
