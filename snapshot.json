@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-18T07:45:15Z",
+  "generatedAt": "2026-11-18T08:15:15Z",
   "network": "testnet-10",
   "stage": "Stage 1",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,22 +7,22 @@
   "covenants": {
     "oracle": {
       "covid": "57241302b9686574237377e780e31f38214558ff421c7066ab84489c1053e2ec",
-      "txid": "f0b0e3533253844e821eb43b01c8c2b6037748d29b97ea7b1641a46d9b36f6fa",
+      "txid": "0f96f8987fb882a95b11a6ab68026e3ad3110816aa33ba4c16221b3926d7e5bd",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 272,
         "mint": 272,
         "liq": 272,
-        "epoch": 590,
-        "last": 626513019,
+        "epoch": 596,
+        "last": 626530787,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000122866,
-        "rem": 266977752
+        "index": 1000123993,
+        "rem": 260077676
       },
-      "address": "kaspatest:pq89xrgmz25s5lcllafultqkacwg8emnfny74hcfzd7k9qs9lqmwsusm4sxem"
+      "address": "kaspatest:ppjm8dju00zyw5r4wy37fadt0dhha0gqyuutl65kt8nqpakjr3ajukvgcme5t"
     },
     "budget": {
       "covid": "ace2bb2c9ba4f0c9ca7d80de7023aaa9640a2055fe1d631c2b3559662bba5c91",
@@ -92,8 +92,8 @@
     "slots": 5,
     "lastRefreshSigners": [
       0,
-      1,
-      2
+      2,
+      3
     ],
     "rotated": [
       {
@@ -729,9 +729,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "f0b0e3533253844e821eb43b01c8c2b6037748d29b97ea7b1641a46d9b36f6fa",
-      "time": 1794987914,
-      "note": "726 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 272 (CoinGecko) / 272 (CoinPaprika) / 272 (Kraken), median $0.0272."
+      "txid": "0f96f8987fb882a95b11a6ab68026e3ad3110816aa33ba4c16221b3926d7e5bd",
+      "time": 1794989714,
+      "note": "732 routine refreshes since 2026-11-15 00:37 UTC keep the feed from going stale. Latest: operators 0, 2 and 3 printed 272 (CoinGecko) / 272 (Kraken) / 272 (KuCoin), median $0.0272."
     }
   ],
   "metering": [
