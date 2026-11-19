@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T11:32:16Z",
+  "generatedAt": "2026-11-19T12:02:34Z",
   "network": "testnet-10",
   "stage": "Stage 2",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,28 +7,28 @@
   "covenants": {
     "oracle": {
       "covid": "0dac704fe95fa389a429eec46e70a04be2a2685cc4c301c8af8569abb221d242",
-      "txid": "ee37eaab003f12a2bed4b5a6064ce71f32caf291f640a90221d1f01036a5f27e",
+      "txid": "dc10fd3ca7d1456757c0def901cb4e40c48dfaa957a5a3a7bdb2b3c6f2519620",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 275,
         "mint": 275,
         "liq": 275,
-        "epoch": 228,
-        "last": 627530387,
+        "epoch": 234,
+        "last": 627548543,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000045066,
-        "rem": 204121118,
+        "index": 1000046218,
+        "rem": 45933107,
         "miner_id": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
         "bounded": 0
       },
-      "address": "kaspatest:pru7csx3lz6elsq027nvzrpdavsm8u4z4xdc8xv744q8zyt6xwtpcdpc2yvwm"
+      "address": "kaspatest:pzf7d390y7tg842u76y5m8c54lkt2k5qen7wak6e22z98yu5lpsjukzxd30hr"
     },
     "miner": {
       "covid": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
-      "txid": "ee37eaab003f12a2bed4b5a6064ce71f32caf291f640a90221d1f01036a5f27e",
+      "txid": "dc10fd3ca7d1456757c0def901cb4e40c48dfaa957a5a3a7bdb2b3c6f2519620",
       "index": 1,
       "amount": 100000000,
       "state": {
@@ -846,9 +846,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "ee37eaab003f12a2bed4b5a6064ce71f32caf291f640a90221d1f01036a5f27e",
-      "time": 1795087935,
-      "note": "222 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 275 (CoinGecko) / 275 (CoinPaprika) / 275 (Kraken), median $0.0275. Miner bound off (stale: votes 1860/6000, anchor age 145562); Stage 1 price."
+      "txid": "dc10fd3ca7d1456757c0def901cb4e40c48dfaa957a5a3a7bdb2b3c6f2519620",
+      "time": 1795089753,
+      "note": "228 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 275 (CoinGecko) / 275 (CoinPaprika) / 275 (Kraken), median $0.0275. Miner bound off (stale: votes 1860/6000, anchor age 163718); Stage 1 price."
     }
   ],
   "metering": [
