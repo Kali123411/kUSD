@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T16:04:27Z",
+  "generatedAt": "2026-11-19T16:34:40Z",
   "network": "testnet-10",
   "stage": "Stage 2",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,28 +7,28 @@
   "covenants": {
     "oracle": {
       "covid": "0dac704fe95fa389a429eec46e70a04be2a2685cc4c301c8af8569abb221d242",
-      "txid": "91eabfc69877476f73695ace03e64b1d7a63ef06dc60b79d9f7b91fd55057590",
+      "txid": "2cbaa6e7f4a60d8a4931616e950ab7ee417c134e3cf6955acc7e55700a51b2d4",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 268,
         "mint": 268,
         "liq": 268,
-        "epoch": 282,
-        "last": 627693132,
+        "epoch": 288,
+        "last": 627712147,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000055388,
-        "rem": 121300257,
+        "index": 1000056594,
+        "rem": 118379810,
         "miner_id": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
         "bounded": 0
       },
-      "address": "kaspatest:pzmc2sqgrufu68agurlqe2udesjkxans5ugkvpvc5xj6wzyed3z0jtklnp8rv"
+      "address": "kaspatest:pphzj87fqzhvxu2ug6yeyxq72hjsutkfzkk20lh4wlvyau3pgzn4ukspzjtp5"
     },
     "miner": {
       "covid": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
-      "txid": "91eabfc69877476f73695ace03e64b1d7a63ef06dc60b79d9f7b91fd55057590",
+      "txid": "2cbaa6e7f4a60d8a4931616e950ab7ee417c134e3cf6955acc7e55700a51b2d4",
       "index": 1,
       "amount": 100000000,
       "state": {
@@ -846,9 +846,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "91eabfc69877476f73695ace03e64b1d7a63ef06dc60b79d9f7b91fd55057590",
-      "time": 1795104266,
-      "note": "276 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 268 (Kraken) / 268 (KuCoin) / 268 (Gate.io), median $0.0268. Miner bound off (stale: votes 1860/6000, anchor age 308307); Stage 1 price."
+      "txid": "2cbaa6e7f4a60d8a4931616e950ab7ee417c134e3cf6955acc7e55700a51b2d4",
+      "time": 1795106079,
+      "note": "282 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 2, 3 and 4 printed 268 (Kraken) / 268 (KuCoin) / 268 (Gate.io), median $0.0268. Miner bound off (stale: votes 1860/6000, anchor age 327322); Stage 1 price."
     }
   ],
   "metering": [
