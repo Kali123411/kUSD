@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T22:37:04Z",
+  "generatedAt": "2026-11-19T23:07:17Z",
   "network": "testnet-10",
   "stage": "Stage 2",
   "repo": "https://github.com/Kali123411/kUSD",
@@ -7,28 +7,28 @@
   "covenants": {
     "oracle": {
       "covid": "0dac704fe95fa389a429eec46e70a04be2a2685cc4c301c8af8569abb221d242",
-      "txid": "118de3d6a8427b23501a220ba3773ab66488d51c4c94e01ab7887cda61105a8b",
+      "txid": "63e6f009a6a3bac3354da94cfada3d0bf821d95e18a19024d552e2e8465469c3",
       "index": 0,
       "amount": 100000000,
       "state": {
         "price": 266,
         "mint": 266,
         "liq": 266,
-        "epoch": 360,
-        "last": 627928485,
+        "epoch": 366,
+        "last": 627946743,
         "status": 0,
         "rate": 200,
         "next_rate": 200,
-        "index": 1000070315,
-        "rem": 97858192,
+        "index": 1000071473,
+        "rem": 96823522,
         "miner_id": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
         "bounded": 0
       },
-      "address": "kaspatest:pz8tfu6nqeqqxppq9yl0qpkr4vhezegeg3zy62zyjwec949yt7axuu9rfj939"
+      "address": "kaspatest:prv2av3ev35zvxxgxfy2qgxyqqdtv5cjmxtjpqd8vlpppsv2scvrkmxrre5mp"
     },
     "miner": {
       "covid": "deb0b4b9268f76c74d9dbe45bc4d0a2c335799f566ea02d7f75d9a61b8957d35",
-      "txid": "118de3d6a8427b23501a220ba3773ab66488d51c4c94e01ab7887cda61105a8b",
+      "txid": "63e6f009a6a3bac3354da94cfada3d0bf821d95e18a19024d552e2e8465469c3",
       "index": 1,
       "amount": 100000000,
       "state": {
@@ -112,7 +112,7 @@
     "lastRefreshSigners": [
       0,
       1,
-      2
+      3
     ],
     "rotated": [
       {
@@ -846,9 +846,9 @@
     {
       "family": "stage1",
       "step": "HEARTBEAT",
-      "txid": "118de3d6a8427b23501a220ba3773ab66488d51c4c94e01ab7887cda61105a8b",
-      "time": 1795127822,
-      "note": "354 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 0, 1 and 2 printed 266 (CoinGecko) / 266 (CoinPaprika) / 266 (Kraken), median $0.0266. Miner bound off (stale: votes 1860/6000, anchor age 543660); Stage 1 price."
+      "txid": "63e6f009a6a3bac3354da94cfada3d0bf821d95e18a19024d552e2e8465469c3",
+      "time": 1795129636,
+      "note": "360 routine refreshes since 2026-11-18 16:15 UTC keep the feed from going stale. Latest: operators 0, 1 and 3 printed 266 (CoinGecko) / 266 (CoinPaprika) / 266 (KuCoin), median $0.0266. Miner bound off (stale: votes 1860/6000, anchor age 561918); Stage 1 price."
     }
   ],
   "metering": [
